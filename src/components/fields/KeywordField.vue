@@ -1,18 +1,25 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { Keywords_Dic, KeywordsDic } from "../../dictionary/RPG_dictionary";
+import {
+  Keywords_Dic,
+  KeywordsDic,
+  Dic,
+} from "../../dictionary/RPG_dictionary";
 const props = withDefaults(
   defineProps<{
     keyword: string;
-    dictionary: keyof KeywordsDic;
+    dictionary: keyof KeywordsDic | undefined;
     span_class?: string;
   }>(),
   { span_class: "default_keyword" }
 );
 
-let keywordInfo = Keywords_Dic[props.dictionary].find(
-  (e: any) => e.keyword === props.keyword
-);
+let keywordInfo: Dic | undefined;
+if (props.dictionary) {
+  keywordInfo = Keywords_Dic[props.dictionary].find(
+    (e: any) => e.keyword === props.keyword
+  );
+}
 
 function openUrl() {
   if (keywordInfo) {

@@ -32,12 +32,21 @@ function scrollToRef(position: number, prevPosition: number) {
         @scroll-to-ref="scrollToRef"
       ></ParameterField>
       <span class="">{{ formContent.Reserved1 }}</span>
-      <span class="Record_Identifying_Indicator">{{
-        formContent.Record_Identifying_Indicator
-      }}</span>
+      <span class="Record_Identifying_Indicator">
+        {{ formContent.Record_Identifying_Indicator }}
+      </span>
       <span class="">{{ formContent.Record_Identification_Code }}</span>
       <span class="">{{ formContent.Reserved2 }}</span>
-      <span class="Comments">{{ formContent.Comments }}</span>
+      <span class="">{{ formContent.Data_Format }}</span>
+      <span class="">{{ formContent.Field_Location }}</span>
+      <span class="">{{ formContent.Decimal_Positions }}</span>
+      <span class="">{{ formContent.Field_Name }}</span>
+      <span class="">{{ formContent.Control_Level }}</span>
+      <span class="">{{ formContent.Matching_Fields }}</span>
+      <span class="">{{ formContent.Field_Record_Relation }}</span>
+      <span class="">{{ formContent.Field_Indicators_Program_Described }}</span>
+      <span class="">{{ formContent.Reserved3 }}</span>
+      <span class="comments">{{ formContent.Comments }}</span>
     </span>
 
     <span v-else-if="rl.formTypeSpecifications == 'Field_Description'">
@@ -64,9 +73,10 @@ function scrollToRef(position: number, prevPosition: number) {
         {{ formContent.Externally_Described_Field_Indicators }}
       </span>
       <span class="">{{ formContent.Reserved4 }}</span>
-      <span class="Comments">{{ formContent.Comments }}</span>
+      <span class="comments">{{ formContent.Comments }}</span>
     </span>
 
+    <!-- Data_Structure -->
     <span v-else-if="rl.formTypeSpecifications == 'Data_Structure'">
       <span class="comments">{{ rl.rawRl.substring(0, 5) }}</span>
       <KeywordField
@@ -101,6 +111,8 @@ function scrollToRef(position: number, prevPosition: number) {
       <span class="Reserved">{{ formContent.Reserved }}</span>
       <span class="comments">{{ formContent.Comments }}</span>
     </span>
+
+    <!-- Data_Structure_Subfield -->
     <span v-else-if="rl.formTypeSpecifications == 'Data_Structure_Subfield'">
       <span class="comments">{{ rl.rawRl.substring(0, 5) }}</span>
       <KeywordField
@@ -150,7 +162,6 @@ function scrollToRef(position: number, prevPosition: number) {
         :keyword="formContent.Data_Type"
         dictionary="Data_Type_Dic"
       ></KeywordField>
-      <!-- <span class="">{{ formContent.Data_Type }}</span> -->
       <span class="">{{ formContent.Reserved2 }}</span>
       <ParameterField
         :field-info-list="field_info"

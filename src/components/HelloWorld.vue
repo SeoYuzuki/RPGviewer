@@ -2,8 +2,8 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { getContentByFile } from "../utils/A1Utils";
 import { getAuxiliaryCrossHandler } from "../utils/AuxiliaryCross";
-import { parseRpgFile } from "../utils/RpgFileParser";
-import { getFieldInfoList } from "../utils/FieldInfoParser";
+import { parseRpgFile } from "../core/RpgFileParser";
+import { getFieldInfoList } from "../core/FieldInfoParser";
 import { ParsedLine } from "../types/parsedRpgFile";
 import { FORM_TYPE_BAR_LIST } from "../dictionary/RPG_dictionary";
 
@@ -29,11 +29,16 @@ const fieldInfoList = ref<FieldInfo[]>([]);
  * @param file
  */
 async function handleUpload(file: File): Promise<boolean> {
-  let res = await getContentByFile(file);
-  // 依照不同From type解析每行
-  parsedRpgFile.value = parseRpgFile(res);
-  // 檢查是否有值得彈出提示或是超連結的欄位
-  fieldInfoList.value = getFieldInfoList(parsedRpgFile.value);
+  try {
+    let res = await getContentByFile(file);
+    // 依照不同From type解析每行
+    parsedRpgFile.value = parseRpgFile(res);
+    // 檢查是否有值得彈出提示或是超連結的欄位
+    fieldInfoList.value = getFieldInfoList(parsedRpgFile.value);
+  } catch (e) {
+    console.log(e);
+  }
+
   return false;
 }
 
@@ -188,7 +193,7 @@ onUnmounted(() => {
             <formTypeC
               v-if="rl.formType === 'C'"
               :rl="rl"
-              :field_info="fieldInfoList"
+              :fieldInfoList="fieldInfoList"
               @scroll-to-ref="scrollToRef"
             >
             </formTypeC>
@@ -202,7 +207,7 @@ onUnmounted(() => {
             <formTypeE
               v-else-if="rl.formType === 'E'"
               :rl="rl"
-              :field_info="fieldInfoList"
+              :fieldInfoList="fieldInfoList"
               @scroll-to-ref="scrollToRef"
             >
             </formTypeE>

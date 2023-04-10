@@ -1,5 +1,188 @@
-import { substr_by_bytes } from "./StringUtils"
-import { ParsedLine } from "../types/parsedRpgFile"
+import { substr_by_bytes } from "../utils/StringUtils"
+import { ParsedLine, RPGContent } from "../types/parsedRpgFile"
+
+/** https://www.ibm.com/docs/en/rdfi/9.6.0?topic=rpg400-language-reference#ToC_286 */
+
+/** parse Extension Specification
+ * 
+ * @param rl 原始行字串
+ */
+function parseExtensionSpecification(rl: string): Map<string, RPGContent> {
+    let contentMap: Map<string, RPGContent> = new Map();
+    contentMap.set('HEAD_COMMENT', { value: substr_by_bytes(rl, 0, 5), class: "comments" });
+    contentMap.set('Form_Type', { value: substr_by_bytes(rl, 5, 1), view: "KeywordField", dic: "Form_Type_Dic" });
+    contentMap.set('Reserved', { value: substr_by_bytes(rl, 6, 4) });
+    contentMap.set('From_File_Name', { value: substr_by_bytes(rl, 10, 8) });
+    contentMap.set('To_File_Name', { value: substr_by_bytes(rl, 18, 8) });
+    contentMap.set('Array_or_Table_Name1', { value: substr_by_bytes(rl, 26, 6), view: "ParameterField" });
+    contentMap.set('Entries_per_Record', { value: substr_by_bytes(rl, 32, 3) });
+    contentMap.set('Entries_per_Array_or_Table', { value: substr_by_bytes(rl, 35, 4) });
+    contentMap.set('Length_of_Entry1', { value: substr_by_bytes(rl, 39, 3) });
+    contentMap.set('Data_Format1', { value: substr_by_bytes(rl, 42, 1) });
+    contentMap.set('Decimal_Positions1', { value: substr_by_bytes(rl, 43, 1), view: "ParameterField" });
+    contentMap.set('Sequence1', { value: substr_by_bytes(rl, 44, 1) });
+    contentMap.set('Array_or_Table_Name2', { value: substr_by_bytes(rl, 45, 6), view: "ParameterField" });
+    contentMap.set('Length_of_Entry2', { value: substr_by_bytes(rl, 51, 3) });
+    contentMap.set('Data_Format2', { value: substr_by_bytes(rl, 54, 1) });
+    contentMap.set('Decimal_Positions2', { value: substr_by_bytes(rl, 55, 1) });
+    contentMap.set('Sequence2', { value: substr_by_bytes(rl, 56, 1) });
+    contentMap.set('Comments', { value: substr_by_bytes(rl, 57, 23), class: "comments" });
+    return contentMap;
+};
+
+
+/** parse Calculation Specification
+ * 
+ * Position 6 (Form Type)
+ * Positions 7-8 (Control Level)
+ * Control Level Indicators
+ * Last Record Indicator
+ * Subroutine Identifier
+ * AND/OR Lines Identifier
+ * Positions 9-17 (Indicators)
+ * Positions 18-27 (Factor 1)
+ * Positions 28-32 (Operation)
+ * Positions 33-42 (Factor 2)
+ * Positions 43-48 (Result Field)
+ * Positions 49-51 (Field Length)
+ * Position 52 (Decimal Positions)
+ * Position 53 (Operation Extender)
+ * Positions 54-59 (Resulting Indicators)
+ * Positions 60-74 (Comments)
+ * Positions 75-80 (Comments)
+ * 
+ * @param rl 原始行字串
+ */
+function parseCalculationSpecification(rl: string): Map<string, RPGContent> {
+    let contentMap: Map<string, RPGContent> = new Map();
+    contentMap.set('HEAD_COMMENT', { value: substr_by_bytes(rl, 0, 5), class: "comments" });
+    contentMap.set('Form_Type', { value: substr_by_bytes(rl, 5, 1), view: "KeywordField", dic: "Form_Type_Dic" });
+    contentMap.set('Control_Level_Indicators', { value: substr_by_bytes(rl, 6, 2) });
+    contentMap.set('N01', { value: substr_by_bytes(rl, 8, 3) });
+    contentMap.set('N02', { value: substr_by_bytes(rl, 11, 3) });
+    contentMap.set('N03', { value: substr_by_bytes(rl, 14, 3) });
+    contentMap.set('Factor1', { value: substr_by_bytes(rl, 17, 7), view: "ParameterField" });
+    contentMap.set('Reserved1', { value: substr_by_bytes(rl, 24, 3) });
+    contentMap.set('Opcde', { value: substr_by_bytes(rl, 27, 5), view: "KeywordField", dic: "Opcde_Dic", class: "opcde" });
+    contentMap.set('Factor2', { value: substr_by_bytes(rl, 32, 7), view: "ParameterField" });
+    contentMap.set('Reserved2', { value: substr_by_bytes(rl, 39, 3) });
+    contentMap.set('Result_Field', { value: substr_by_bytes(rl, 42, 6), view: "ParameterField" });
+    contentMap.set('Field_Length', { value: substr_by_bytes(rl, 48, 3) });
+    contentMap.set('Decimal_Positions', { value: substr_by_bytes(rl, 51, 1) });
+    contentMap.set('Operation_Extender', { value: substr_by_bytes(rl, 52, 1) });
+    contentMap.set('Resulting_Indicators_Hi', { value: substr_by_bytes(rl, 53, 2) });
+    contentMap.set('Resulting_Indicators_Lo', { value: substr_by_bytes(rl, 55, 2) });
+    contentMap.set('Resulting_Indicators_Eq', { value: substr_by_bytes(rl, 57, 2) });
+    contentMap.set('Comments', { value: substr_by_bytes(rl, 59, 20) });
+
+    return contentMap;
+}
+
+function ezCutUtil(rl: string) {
+    return (a: number, b: number): string => {
+        return substr_by_bytes(rl, a - 1, b - a + 1);
+    }
+}
+
+/**
+ * Input spec record identification (I prompt)
+ */
+function parseRecordIdentificationEntries_I(rl: string): Map<string, RPGContent> {
+    let ezCut = ezCutUtil(rl);
+
+    let contentMap: Map<string, RPGContent> = new Map();
+    contentMap.set('HEAD_COMMENT', { value: ezCut(1, 5), class: "comments" });
+    contentMap.set('Form Type', { value: ezCut(6, 6), view: "KeywordField", dic: "Form_Type_Dic" });
+    contentMap.set('File Name', { value: ezCut(7, 14) });
+    contentMap.set('Logical Relationship', { value: ezCut(14, 16) });
+    contentMap.set('Number', { value: ezCut(17, 17) });
+    contentMap.set('Option', { value: ezCut(18, 18) });
+    contentMap.set('Record Identifying Indicator', { value: ezCut(19, 20) });
+    /** Positions 21-41 (Record Identification Codes) */
+    contentMap.set('Position1', { value: ezCut(21, 24) });
+    contentMap.set('Not1', { value: ezCut(25, 25) });
+    contentMap.set('Code Part1', { value: ezCut(26, 26) });
+    contentMap.set('Character1', { value: ezCut(27, 27) });
+    contentMap.set('Position2', { value: ezCut(28, 31) });
+    contentMap.set('Not2', { value: ezCut(32, 32) });
+    contentMap.set('Code Part2', { value: ezCut(33, 33) });
+    contentMap.set('Character2', { value: ezCut(34, 34) });
+    contentMap.set('Position3', { value: ezCut(35, 38) });
+    contentMap.set('Not3', { value: ezCut(39, 39) });
+    contentMap.set('Code Part3', { value: ezCut(40, 40) });
+    contentMap.set('Character3', { value: ezCut(41, 41) });
+
+    contentMap.set('Reserved', { value: ezCut(42, 42) });
+    return contentMap;
+}
+
+/**
+ * Input spec field description (J prompt)
+ */
+function parseFieldDescriptionEntries_J(rl: string): Map<string, RPGContent> {
+    let ezCut = ezCutUtil(rl);
+
+    let contentMap: Map<string, RPGContent> = new Map();
+    contentMap.set('Data Format', { value: ezCut(43, 43) });
+    contentMap.set('Field Location', { value: ezCut(44, 51) });
+    contentMap.set('Decimal Positions', { value: ezCut(52, 52) });
+
+    contentMap.set('Field Name', { value: ezCut(53, 58) });
+    contentMap.set('Control Level', { value: ezCut(59, 60) });
+    contentMap.set('Matching Fields', { value: ezCut(61, 62) });
+    contentMap.set('Field Record Relation', { value: ezCut(63, 64) });
+    contentMap.set('Field Indicators - Program Described', { value: ezCut(65, 70) });
+    contentMap.set('Reserved', { value: ezCut(71, 74) });
+    contentMap.set('Comments', { value: ezCut(75, 80) });
+
+    return contentMap;
+}
+
+/**
+ * Input spec record identification external (IX prompt)
+ * @param rl 
+ */
+function parseRecordIdentificationEntries_IX(rl: string): Map<string, RPGContent> {
+    let ezCut = ezCutUtil(rl);
+
+    let contentMap: Map<string, RPGContent> = new Map();
+    contentMap.set('HEAD_COMMENT', { value: ezCut(1, 5), class: "comments" });
+    contentMap.set('Form Type', { value: ezCut(6, 6), view: "KeywordField", dic: "Form_Type_Dic" });
+    contentMap.set('File Name', { value: ezCut(7, 14) });
+    contentMap.set('Logical Relationship', { value: ezCut(14, 16) });
+    contentMap.set('Number', { value: ezCut(17, 17) });
+    contentMap.set('Option', { value: ezCut(18, 18) });
+    contentMap.set('Record Identifying Indicator', { value: ezCut(19, 20) });
+    /** Positions 21-41 (Record Identification Codes) */
+    contentMap.set('Position1', { value: ezCut(21, 24) });
+    contentMap.set('Not1', { value: ezCut(25, 25) });
+    contentMap.set('Code Part1', { value: ezCut(26, 26) });
+    contentMap.set('Character1', { value: ezCut(27, 27) });
+    contentMap.set('Position2', { value: ezCut(28, 31) });
+    contentMap.set('Not2', { value: ezCut(32, 32) });
+    contentMap.set('Code Part2', { value: ezCut(33, 33) });
+    contentMap.set('Character2', { value: ezCut(34, 34) });
+    contentMap.set('Position3', { value: ezCut(35, 38) });
+    contentMap.set('Not3', { value: ezCut(39, 39) });
+    contentMap.set('Code Part3', { value: ezCut(40, 40) });
+    contentMap.set('Character3', { value: ezCut(41, 41) });
+
+    contentMap.set('Reserved', { value: ezCut(42, 42) });
+    return contentMap;
+}
+
+
+/**
+ * Input spec field description external (JX prompt)
+ * @TODO https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh126.html#HDRIED
+ * @param rl 
+ */
+function parseFieldDescriptionEntries_JX(rl: string): Map<string, RPGContent> {
+    let ezCut = ezCutUtil(rl);
+
+    let contentMap: Map<string, RPGContent> = new Map();
+    return contentMap;
+}
 
 const parseRpgFile = function (_rpgFile: string) {
     let rpgFile = _rpgFile.split('\r\n');
@@ -9,33 +192,13 @@ const parseRpgFile = function (_rpgFile: string) {
         // C卡
         if (rl[6] !== '*') {
             if (rl[5] === 'E') {
-                // Extension Specification
+                // Extension Specification 
                 parsedRpgFile.push({
                     index: i,
                     rawRl: rl,
                     formType: "E",
                     formTypeSpecifications: "Extension_Specification",
-                    formContent: {
-                        Reserved: substr_by_bytes(rl, 6, 4),
-                        From_File_Name: substr_by_bytes(rl, 10, 8),
-                        To_File_Name: substr_by_bytes(rl, 18, 8),
-                        Array_or_Table_Name1: substr_by_bytes(rl, 26, 6),
-                        Entries_per_Record: substr_by_bytes(rl, 32, 3),
-                        Entries_per_Array_or_Table: substr_by_bytes(rl, 35, 4),
-                        Length_of_Entry1: substr_by_bytes(rl, 39, 3),
-                        Data_Format1: substr_by_bytes(rl, 42, 1),
-                        Decimal_Positions1: substr_by_bytes(rl, 43, 1),
-                        Sequence1: substr_by_bytes(rl, 44, 1),
-                        Second_Array_Description: substr_by_bytes(rl, 45, 12), //
-
-                        Array_or_Table_Name2: substr_by_bytes(rl, 45, 6),
-                        Length_of_Entry2: substr_by_bytes(rl, 51, 3),
-                        Data_Format2: substr_by_bytes(rl, 54, 1),
-                        Decimal_Positions2: substr_by_bytes(rl, 55, 1),
-                        Sequence2: substr_by_bytes(rl, 56, 1),
-
-                        Comments: substr_by_bytes(rl, 57, 23),
-                    }
+                    contentMap: parseExtensionSpecification(rl),
                 });
             } else if (rl[5] === 'C') {
                 // Calculation_Specification
@@ -44,25 +207,7 @@ const parseRpgFile = function (_rpgFile: string) {
                     rawRl: rl,
                     formType: "C",
                     formTypeSpecifications: "Calculation_Specification",
-                    formContent: {
-                        Control_Level_Indicators: substr_by_bytes(rl, 6, 2),
-                        N01: substr_by_bytes(rl, 8, 3),
-                        N02: substr_by_bytes(rl, 11, 3),
-                        N03: substr_by_bytes(rl, 14, 3),
-                        Factor1: substr_by_bytes(rl, 17, 7),
-                        Reserved1: substr_by_bytes(rl, 24, 3),
-                        Opcde: substr_by_bytes(rl, 27, 5),
-                        Factor2: substr_by_bytes(rl, 32, 7),
-                        Reserved2: substr_by_bytes(rl, 39, 3),
-                        Result_Field: substr_by_bytes(rl, 42, 6),
-                        Field_Length: substr_by_bytes(rl, 48, 3),
-                        Decimal_Positions: substr_by_bytes(rl, 51, 1),
-                        Operation_Extender: substr_by_bytes(rl, 52, 1),
-                        Resulting_Indicators_Hi: substr_by_bytes(rl, 53, 2),
-                        Resulting_Indicators_Lo: substr_by_bytes(rl, 55, 2),
-                        Resulting_Indicators_Eq: substr_by_bytes(rl, 57, 2),
-                        Comments: substr_by_bytes(rl, 59, 20),
-                    }
+                    contentMap: parseCalculationSpecification(rl)
                 });
             } else if (rl[5] === 'I') {
                 if (substr_by_bytes(rl, 18, 2) !== 'DS'
@@ -80,7 +225,16 @@ const parseRpgFile = function (_rpgFile: string) {
                             Reserved1: substr_by_bytes(rl, 14, 4),
                             Record_Identifying_Indicator: substr_by_bytes(rl, 18, 2),
                             Record_Identification_Code: substr_by_bytes(rl, 20, 21),
-                            Reserved2: substr_by_bytes(rl, 41, 23),
+                            Reserved2: substr_by_bytes(rl, 41, 1),
+                            Data_Format: substr_by_bytes(rl, 42, 1),
+                            Field_Location: substr_by_bytes(rl, 43, 8),
+                            Decimal_Positions: substr_by_bytes(rl, 51, 1),
+                            Field_Name: substr_by_bytes(rl, 52, 6),
+                            Control_Level: substr_by_bytes(rl, 58, 2),
+                            Matching_Fields: substr_by_bytes(rl, 60, 2),
+                            Field_Record_Relation: substr_by_bytes(rl, 62, 2),
+                            Field_Indicators_Program_Described: substr_by_bytes(rl, 64, 6),
+                            Reserved3: substr_by_bytes(rl, 70, 4),
                             Comments: substr_by_bytes(rl, 74, 6),
                         }
                     });

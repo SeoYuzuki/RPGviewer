@@ -1,0 +1,25 @@
+     H                                                                    TSTPGM
+     FFILE1   IF  E                    DISK                               COMM1
+     FQSYSPRT O   F     132     OF    LPRINTER
+     LQSYSPRT  60FL 56OL
+     E                    ARR1    3   3  1               COMM2
+     E                    ARR2    3   3  1
+     IFORMAT1
+     I              OLDNAME                         NAME
+     I* DATA STRUCTURE COMMENT
+     IDS1         DS
+     I                                        1   3 FIELD1
+     I* NAMED CONSTANT COMMENT
+     I              'XYZ'                 C         CONST1                COMM3
+     I                                        4   6 ARR1
+     C           ARR1,3    DSPLY
+     C                     READ FORMAT1                  01
+     C           NAME      DSPLY
+     C                     SETON                     LR
+     C                     EXCPTOUTPUT
+     OQSYSPRT E   01           OUTPUT
+     O                         ARR2,3    10
+**
+123
+**
+456

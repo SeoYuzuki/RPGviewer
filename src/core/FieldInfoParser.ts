@@ -1,5 +1,5 @@
-import { isNotBlank, isBlank } from "./StringUtils"
-import { ParsedLine } from "../types/parsedRpgFile"
+import { isNotBlank, isBlank } from "../utils/StringUtils"
+import { ParsedLine, RPGContent } from "../types/parsedRpgFile"
 import { FieldInfo } from "../types/FieldInfo";
 
 const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
@@ -9,53 +9,59 @@ const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
         let rl: ParsedLine = noCommentsRpg[count];
         // C卡
         if (rl.formType === 'C') {
-            // 變數初始化位置
-            if (rl.formContent.Field_Length.trim() > 0) {
-                fieldInfoList.push({
-                    position: rl.index,
-                    fieldName: rl.formContent.Result_Field,
-                    reason: "Field_Length",
-                    info: {
-                        content: "A field with a length of " + rl.formContent.Field_Length + ',' + rl.formContent.Decimal_Positions,
-                        title: ""
-                    },
-                });
-            }
-            // BEGSR: 表示function名稱
-            if (rl.formContent.Opcde === 'BEGSR') {
-                fieldInfoList.push({
-                    position: rl.index,
-                    fieldName: rl.formContent.Factor1,
-                    reason: "BEGSR",
+            if (rl.contentMap) {
+                let map: Map<String, RPGContent> = rl.contentMap;
+                // 變數初始化位置
+                if (map.get("Field_Length")?.value?.trim()) {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Result_Field")?.value ?? "",
+                        reason: "Field_Length",
+                        info: {
+                            content: "A field with a length of " +
+                                map.get("Field_Length")?.value + ',' +
+                                map.get("Decimal_Positions")?.value,
+                            title: ""
+                        },
+                    });
+                }
+                // BEGSR: 表示function名稱
+                if (map.get("Opcde")?.value === 'BEGSR') {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Factor1")?.value ?? "",
+                        reason: "BEGSR",
 
-                    info: {
-                        content: "Subroutine.",
-                        title: ""
-                    },
-                });
-            }
-            //
-            if (rl.formContent.Opcde === 'KLIST') {
-                let kfld = [];
-                for (let k = 1; ; k++) {
-                    let temp_rl = noCommentsRpg[count + k];
-                    if (temp_rl.formContent?.Opcde === 'KFLD ') {
-                        kfld.push(temp_rl.formContent.Result_Field);
-                    } else {
-                        break;
-                    }
+                        info: {
+                            content: "Subroutine.",
+                            title: ""
+                        },
+                    });
                 }
 
-                fieldInfoList.push({
-                    position: rl.index,
-                    fieldName: rl.formContent.Factor1,
-                    reason: "KLIST",
+                /** KLIST */
+                if (map.get("Opcde")?.value === 'KLIST') {
+                    let kfld = [];
+                    for (let k = 1; ; k++) {
+                        let temp_rl = noCommentsRpg[count + k];
+                        if (temp_rl.contentMap?.get("Opcde")?.value === 'KFLD ') {
+                            kfld.push(temp_rl.contentMap.get("Result_Field")?.value);
+                        } else {
+                            break;
+                        }
+                    }
 
-                    info: {
-                        content: "KLIST with KFLD: " + kfld,
-                        title: ""
-                    },
-                });
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Factor1")?.value ?? "",
+                        reason: "KLIST",
+
+                        info: {
+                            content: "KLIST with KFLD: " + kfld,
+                            title: ""
+                        },
+                    });
+                }
             }
         } else if (rl.formType === 'I') {
             if (rl.formTypeSpecifications === "Data_Structure" && isNotBlank(rl.formContent.Data_Structure_Name)) {
@@ -139,27 +145,32 @@ const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
                 });
             }
         } else if (rl.formType === 'E') {
-            fieldInfoList.push({
-                position: rl.index,
-                fieldName: rl.formContent.Array_or_Table_Name1,
-                reason: "E_Array_or_Table_Name1",
+            if (rl.contentMap) {
+                let map: Map<String, RPGContent> = rl.contentMap;
+                if (map.get("Array_or_Table_Name1")) {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Array_or_Table_Name1")?.value ?? "",
+                        reason: "E_Array_or_Table_Name1",
 
-                info: {
-                    content: (
-                        "It's a Array or Table.\r\n" +
-                        "Entries per Record:" +
-                        rl.formContent.Entries_per_Record +
-                        "\r\n" +
-                        "Entries per Array or Table:" +
-                        rl.formContent.Entries_per_Array_or_Table +
-                        "\r\n" +
-                        "Length of Entry:" +
-                        rl.formContent.Length_of_Entry1 +
-                        "\r\n"
-                    ),
-                    title: ""
+                        info: {
+                            content: (
+                                "It's a Array or Table.\r\n" +
+                                "Entries per Record:" +
+                                map.get("Entries_per_Record")?.value +
+                                "\r\n" +
+                                "Entries per Array or Table:" +
+                                map.get("Entries_per_Array_or_Table")?.value +
+                                "\r\n" +
+                                "Length of Entry:" +
+                                map.get("Length_of_Entry1")?.value +
+                                "\r\n"
+                            ),
+                            title: ""
+                        }
+                    });
                 }
-            });
+            }
         }
     }
 

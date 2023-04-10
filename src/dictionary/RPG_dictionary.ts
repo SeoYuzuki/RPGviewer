@@ -6,6 +6,7 @@ interface Dic {
     readonly content: string
     readonly website: string
 }
+
 interface KeywordsDic {
     readonly Form_Type_Dic: Dic[];
     readonly Opcde_Dic: Dic[];
@@ -189,6 +190,6 @@ const Keywords_Dic: KeywordsDic = {
     "Data_Type_Dic": Data_Type_Dic
 }
 
-export type { KeywordsDic, FormTypeBar };
+export type { KeywordsDic, FormTypeBar, Dic };
 export { opcdeDictionary, Keywords_Dic, FORM_TYPE_BAR_LIST, Constants };
 

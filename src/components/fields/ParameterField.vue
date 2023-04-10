@@ -7,7 +7,7 @@ const props = defineProps<{
   field_text: string;
   index: number;
 }>();
-// console.log(props.field_info, props.field_text, props.index);
+// console.log(props.fieldInfoList, props.field_text, props.index);
 let targetFieldInfo = props.fieldInfoList.find(
   (e: any) => e.fieldName.trim() === props.field_text.trim().split(",")[0]
 );
