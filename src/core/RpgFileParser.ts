@@ -181,6 +181,17 @@ function parseFieldDescriptionEntries_JX(rl: string): Map<string, RPGContent> {
     let ezCut = ezCutUtil(rl);
 
     let contentMap: Map<string, RPGContent> = new Map();
+    contentMap.set('Reserved', { value: ezCut(7, 20) });
+    contentMap.set('External Field Name', { value: ezCut(21, 30) });
+    contentMap.set('Reserved', { value: ezCut(31, 52) });
+    contentMap.set('Field Name', { value: ezCut(53, 58) });
+    contentMap.set('Control Level', { value: ezCut(59, 60) });
+    contentMap.set('Matching Fields', { value: ezCut(61, 62) });
+    contentMap.set('Reserved', { value: ezCut(63, 64) });
+    contentMap.set('Externally Described Field Indicators', { value: ezCut(65, 70) });
+    contentMap.set('Reserved', { value: ezCut(71, 74) });
+    contentMap.set('Comments', { value: ezCut(75, 80) });
+
     return contentMap;
 }
 
