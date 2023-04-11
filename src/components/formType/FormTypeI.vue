@@ -5,7 +5,7 @@ import ParameterField from "../fields/ParameterField.vue";
 import KeywordField from "../fields/KeywordField.vue";
 import { FieldInfo } from "../../types/FieldInfo";
 
-const props = defineProps<{ rl: ParsedLine; field_info: FieldInfo[] }>();
+const props = defineProps<{ rl: ParsedLine; fieldInfoList: FieldInfo[] }>();
 const emit = defineEmits<{
   (e: "scrollToRef", position: number, prevPosition: number): void;
 }>();
@@ -19,161 +19,23 @@ function scrollToRef(position: number, prevPosition: number) {
 
 <template>
   <span>
-    <span v-if="rl.formTypeSpecifications == 'Record_Identification'">
-      <span class="comments">{{ rl.rawRl.substring(0, 5) }}</span>
-      <KeywordField
-        :keyword="rl.formType"
-        dictionary="Form_Type_Dic"
-      ></KeywordField>
-      <ParameterField
-        :field-info-list="field_info"
-        :field_text="formContent.Record_Name"
-        :index="rl.index"
-        @scroll-to-ref="scrollToRef"
-      ></ParameterField>
-      <span class="">{{ formContent.Reserved1 }}</span>
-      <span class="Record_Identifying_Indicator">
-        {{ formContent.Record_Identifying_Indicator }}
-      </span>
-      <span class="">{{ formContent.Record_Identification_Code }}</span>
-      <span class="">{{ formContent.Reserved2 }}</span>
-      <span class="">{{ formContent.Data_Format }}</span>
-      <span class="">{{ formContent.Field_Location }}</span>
-      <span class="">{{ formContent.Decimal_Positions }}</span>
-      <span class="">{{ formContent.Field_Name }}</span>
-      <span class="">{{ formContent.Control_Level }}</span>
-      <span class="">{{ formContent.Matching_Fields }}</span>
-      <span class="">{{ formContent.Field_Record_Relation }}</span>
-      <span class="">{{ formContent.Field_Indicators_Program_Described }}</span>
-      <span class="">{{ formContent.Reserved3 }}</span>
-      <span class="comments">{{ formContent.Comments }}</span>
-    </span>
-
-    <span v-else-if="rl.formTypeSpecifications == 'Field_Description'">
-      <span class="comments">{{ rl.rawRl.substring(0, 5) }}</span>
-      <KeywordField
-        :keyword="rl.formType"
-        dictionary="Form_Type_Dic"
-      ></KeywordField>
-      <span class="">{{ formContent.Reserved1 }}</span>
-      <span class="External_Field_Name">{{
-        formContent.External_Field_Name
-      }}</span>
-      <span class="">{{ formContent.Reserved2 }}</span>
-      <ParameterField
-        :field-info-list="field_info"
-        :field_text="formContent.Field_Name"
-        :index="rl.index"
-        @scroll-to-ref="scrollToRef"
-      ></ParameterField>
-      <span class="">{{ formContent.Control_Level }}</span>
-      <span class="Matching_Fields">{{ formContent.Matching_Fields }}</span>
-      <span class="">{{ formContent.Reserved3 }}</span>
-      <span class="Externally_Described_Field_Indicators">
-        {{ formContent.Externally_Described_Field_Indicators }}
-      </span>
-      <span class="">{{ formContent.Reserved4 }}</span>
-      <span class="comments">{{ formContent.Comments }}</span>
-    </span>
-
-    <!-- Data_Structure -->
-    <span v-else-if="rl.formTypeSpecifications == 'Data_Structure'">
-      <span class="comments">{{ rl.rawRl.substring(0, 5) }}</span>
-      <KeywordField
-        :keyword="rl.formType"
-        dictionary="Form_Type_Dic"
-      ></KeywordField>
-      <ParameterField
-        :field-info-list="field_info"
-        :field_text="formContent.Data_Structure_Name"
-        :index="rl.index"
-        @scroll-to-ref="scrollToRef"
-      ></ParameterField>
-      <span class="Reserved1">{{ formContent.Reserved1 }}</span>
-      <span class="External_Description">{{
-        formContent.External_Description
-      }}</span>
-      <span class="Option">{{ formContent.Option }}</span>
-      <KeywordField
-        class="Record_Identifying_Indicator"
-        dictionary="Record_Identifying_Indicator_Dic"
-        :keyword="formContent.Record_Identifying_Indicator"
-      >
-      </KeywordField>
-      <span class="External_File_Name">{{
-        formContent.External_File_Name
-      }}</span>
-      <span class="Reserved2">{{ formContent.Reserved2 }}</span>
-      <span class="Data_Structure_Occurrences">{{
-        formContent.Data_Structure_Occurrences
-      }}</span>
-      <span class="Length">{{ formContent.Length }}</span>
-      <span class="Reserved">{{ formContent.Reserved }}</span>
-      <span class="comments">{{ formContent.Comments }}</span>
-    </span>
-
-    <!-- Data_Structure_Subfield -->
-    <span v-else-if="rl.formTypeSpecifications == 'Data_Structure_Subfield'">
-      <span class="comments">{{ rl.rawRl.substring(0, 5) }}</span>
-      <KeywordField
-        :keyword="rl.formType"
-        dictionary="Form_Type_Dic"
-      ></KeywordField>
-      <span class="">{{ formContent.Reserved1 }}</span>
-      <span class="">{{ formContent.Initialization_Option }}</span>
-      <span class="">{{ formContent.Reserved2 }}</span>
-      <template v-if="formContent.Initialization_Option !== 'I'">
-        <span name="External_Field_Name">{{
-          formContent.External_Field_Name
-        }}</span>
-        <span name="Reserved3">{{ formContent.Reserved3 }}</span>
+    <template v-for="[key, value] in rl.contentMap">
+      <template v-if="value.view === 'KeywordField'">
+        <KeywordField
+          :keyword="value.value"
+          :dictionary="value.dic"
+        ></KeywordField>
       </template>
-      <span v-else class="static_string" name="Initialization_Value">{{
-        formContent.Initialization_Value
-      }}</span>
-      <span class="">{{ formContent.Internal_Data_Format }}</span>
-      <span class="">{{ formContent.Field_Location }}</span>
-      <span class="static_number">{{ formContent.Decimal_Positions }}</span>
-      <ParameterField
-        :field-info-list="field_info"
-        :field_text="formContent.Field_Name"
-        :index="rl.index"
-        @scroll-to-ref="scrollToRef"
-      ></ParameterField>
-      <span class="">{{ formContent.Reserved4 }}</span>
-      <span class="comments">{{ formContent.Comments }}</span>
-    </span>
-
-    <!-- Named_Constant -->
-    <span v-else-if="rl.formTypeSpecifications == 'Named_Constant'">
-      <span class="comments">{{ rl.rawRl.substring(0, 5) }}</span>
-      <KeywordField
-        :keyword="rl.formType"
-        dictionary="Form_Type_Dic"
-      ></KeywordField>
-      <span class="">{{ formContent.Reserved1 }}</span>
-      <ParameterField
-        :field-info-list="field_info"
-        :field_text="formContent.Constant"
-        :index="rl.index"
-        @scroll-to-ref="scrollToRef"
-      ></ParameterField>
-      <KeywordField
-        :keyword="formContent.Data_Type"
-        dictionary="Data_Type_Dic"
-      ></KeywordField>
-      <span class="">{{ formContent.Reserved2 }}</span>
-      <ParameterField
-        :field-info-list="field_info"
-        :field_text="formContent.Constant_Name"
-        :index="rl.index"
-        @scroll-to-ref="scrollToRef"
-      ></ParameterField>
-      <span class="">{{ formContent.Reserved3 }}</span>
-      <span class="comments">{{ formContent.Comments }}</span>
-    </span>
-
-    <span v-else> {{ rl.rawRl }} </span>
+      <template v-else-if="value.view === 'ParameterField'">
+        <ParameterField
+          :field-info-list="fieldInfoList"
+          :field_text="value.value"
+          :index="rl.index"
+          @scroll-to-ref="scrollToRef"
+        ></ParameterField>
+      </template>
+      <span v-else :class="value.class">{{ value.value }}</span>
+    </template>
   </span>
 </template>
 

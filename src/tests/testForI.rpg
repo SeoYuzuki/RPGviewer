@@ -1,0 +1,85 @@
+     IMORGR                                                               comment
+     I              CMCNM                           @CMCNM                comment
+     IMCARR                                                               comment
+     I              ISDT                            @ISDT                 comment
+     I              CHGDT                           @CHGDT                comment
+     I              SLDT                            @SLDT                 comment
+     I              SYSDT                           @SYSDT                comment
+      *---------------------------------------------------------------*
+     IMVPCR                                                               comment
+     I              VIPNO                           VPC01                 comment
+     I              VIPTP                           VPC02                 comment
+     I              CHID                            VPC03                 comment
+     I              BUSID                           VPC04                 comment
+     I              AGNO                            VPC05                 comment
+     I              CURCD                           VPC06                 comment
+     I              ANLTP                           VPC07                 comment
+     I              EFSYM                           VPC08                 comment
+     I              EFEYM                           VPC09                 comment
+     I              ISDT                            VPC10                 comment
+      *---------------------------------------------------------------*   comment
+     I           SDS                                                      comment
+     I                                     *PROGRAM MSGQ                  comment
+     I                                      254 263 USRID                 comment
+     I                                      254 259 USRID1                comment
+      *---------------------------------------------------------------*   comment
+     I           UDS                                                      comment
+     I                                       33  42 #SRMBR                comment
+     I                                      170 179 #WSID                 comment
+      *---------------------------------------------------------------*   comment
+     I#0E0F       DS                                                      comment
+     I                                        1   1 #0E                   comment
+     I                                        2   2 #0F                   comment
+      *---------------------------------------------------------------*   comment
+     I            DS                                                      comment
+     I                                        1  12 POCHNM                comment
+     I                                        4   5 POCHN1                comment
+     I            DS                                                      comment
+     I                                        1  12 PCHCNM                comment
+     I                                        4   5 PCHCN1                comment
+     I            DS                                                      comment
+     I I            ' Ｘ '                    1   4 #MASK                 comment
+     I                                        2   3 #MASK1                comment
+     I            DS                                                      comment
+     I                                        1  11 PCHID                 comment
+     I                                        4   8 PCHID1                comment
+     I*The following is an example of a character constant:               comment
+     I              'MICKEY'              C         MOUSE                 comment
+     ******************************************************************** comment
+     IINVHDR  NS  01   1NC                                                comment
+     I                                        1   3 STORE L1              comment
+     I                                        4  13 INVNO                 comment
+     I                                       14  20 CUSTNO                comment
+     I                                       21  45 STNAM                 comment
+     I                                       46  53 INVDAT                comment
+     I                                       54  622TOTINV                comment
+     I           UDS                                                      comment
+     I                                        1   8 RPTDAT                comment
+     ********************************************************************************
+     I#S0182      DS
+SEQTPI                                        1   2 S1821
+SEQT2I                                        3  22 S1822
+PROC I I            '1'                      23  23 S1823
+FRMT I I            'S'                      24  24 S1824
+LEN  I I            15                       25  260S1825
+YFG  I I            ' '                      27  27 S1826
+FILL2I                                       28  29 S1827
+RSTFGI                                       30  30 S1828
+      *
+CUSEQI                                       31  50 S1829
+     I                                       31  45 S18291
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

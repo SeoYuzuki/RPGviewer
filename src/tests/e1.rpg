@@ -1,0 +1,26 @@
+     H* RPG Tutorial: Example Program 1 - List Cards on Printer
+     H
+     H*
+     H* READ ADDRESS CARDS AND PRINT ADDRESS LIST
+     H*
+     FINCARDS IPE F  80  80            READ40
+     FOUTLIST O   F 132 132     OF    LPRINTER
+     LOUTLIST 0010106012
+     IINCARDS AA  01
+     I                                        1  25 NAME
+     I                                       26  50 ADDR1
+     I                                       51  75 ADDR2
+     OOUTLIST H  201   1P
+     O       OR        OF
+     O                         PAGE  Z   40
+     O                                   36 'PAGE'
+     O                                   23 'ADDRESS LIST'
+     O                         UDATE      8 ' 0/  /  '
+     O        D  1     01
+     O                         NAME      30
+     O        D  1     01
+     O                         ADDR1     30
+     O        D  2     01
+     O                         ADDR2     30
+     O        T 3   01 LR
+     O                                   24 '*** END OF LIST ***'

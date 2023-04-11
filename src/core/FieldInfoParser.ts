@@ -15,7 +15,7 @@ const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
                 if (map.get("Field_Length")?.value?.trim()) {
                     fieldInfoList.push({
                         position: rl.index,
-                        fieldName: map.get("Result_Field")?.value ?? "",
+                        fieldName: map.get("Result_Field")?.value,
                         reason: "Field_Length",
                         info: {
                             content: "A field with a length of " +
@@ -29,7 +29,7 @@ const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
                 if (map.get("Opcde")?.value === 'BEGSR') {
                     fieldInfoList.push({
                         position: rl.index,
-                        fieldName: map.get("Factor1")?.value ?? "",
+                        fieldName: map.get("Factor1")?.value,
                         reason: "BEGSR",
 
                         info: {
@@ -53,7 +53,7 @@ const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
 
                     fieldInfoList.push({
                         position: rl.index,
-                        fieldName: map.get("Factor1")?.value ?? "",
+                        fieldName: map.get("Factor1")?.value,
                         reason: "KLIST",
 
                         info: {
@@ -64,6 +64,94 @@ const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
                 }
             }
         } else if (rl.formType === 'I') {
+            if (rl.contentMap) {
+                let map: Map<String, RPGContent> = rl.contentMap;
+                if (rl.formTypeSpecifications === "Record_Identification") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("File Name")?.value,
+                        reason: "?",
+
+                        info: {
+                            content: "File",
+                            title: "",
+                            class: "file"
+                        }
+                    });
+                } else if (rl.formTypeSpecifications === "Field_Description") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Field Name")?.value,
+                        reason: "?",
+
+                        info: {
+                            content: "field of File",
+                            title: "",
+                        }
+                    });
+                } else if (rl.formTypeSpecifications === "Record_Identification_External") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Record Name")?.value,
+                        reason: "?",
+
+                        info: {
+                            content: "Record",
+                            class: "record",
+                            title: "",
+                        }
+                    });
+                } else if (rl.formTypeSpecifications === "Field_Description_External") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Field Name")?.value,
+                        reason: "?",
+
+                        info: {
+                            content: "Field of record.",
+                            title: "",
+                        }
+                    });
+                } else if (rl.formTypeSpecifications === "Data_Structure") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Data Structure Name")?.value,
+                        reason: "?",
+
+                        info: {
+                            content: "Data Structure.",
+                            class: "data-structure",
+                            title: "",
+                        }
+                    });
+                } else if (rl.formTypeSpecifications === "Data_Structure_Subfield") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Field Name")?.value,
+                        reason: "?",
+
+                        info: {
+                            content: "Field Name",
+                            title: "",
+                        }
+                    });
+                } else if (rl.formTypeSpecifications === "Named_Constant") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Constant Name")?.value,
+                        reason: "?",
+
+                        info: {
+                            content: "Constant Name",
+                            title: "",
+                        }
+                    });
+                }
+            }
+
+
+
+            continue;
             if (rl.formTypeSpecifications === "Data_Structure" && isNotBlank(rl.formContent.Data_Structure_Name)) {
                 fieldInfoList.push({
                     position: rl.index,

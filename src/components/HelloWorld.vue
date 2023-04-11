@@ -55,7 +55,7 @@ function getElementClass(index: number) {
 }
 
 function onElementClicked(rl: ParsedLine, index: number) {
-  console.log(index, rl);
+  console.log(rl.formTypeSpecifications, index, rl);
   lineClicked.value = index;
   if (rl.formTypeSpecifications) {
     selectedBarModel.value = rl.formTypeSpecifications;
@@ -63,7 +63,7 @@ function onElementClicked(rl: ParsedLine, index: number) {
 }
 const selectedBar = computed(() => {
   if (selectedBarModel.value) {
-    console.log(selectedBarModel.value);
+    //console.log(selectedBarModel.value);
     return (
       FORM_TYPE_BAR_LIST.find((e) => e.value === selectedBarModel.value)?.bar ??
       ""
@@ -151,6 +151,8 @@ onUnmounted(() => {
     </Col>
   </Row>
   <Row :gutter="0">
+    <Col span="18"> {{ "_____________________1_________2_________3_________4_________5_________6_________7_________8" }}</Col>
+    <Col span="18"> {{ "____________12345678901234567890123456789012345678901234567890123456789012345678901234567890" }}</Col>
     <Col span="18"> {{ "_______INDEX" }}{{ selectedBar }} </Col>
     <Col span="6">
       <Select v-model="selectedBarModel" style="width: 250px" size="small">
@@ -200,7 +202,7 @@ onUnmounted(() => {
             <formTypeI
               v-else-if="rl.formType === 'I'"
               :rl="rl"
-              :field_info="fieldInfoList"
+              :fieldInfoList="fieldInfoList"
               @scroll-to-ref="scrollToRef"
             >
             </formTypeI>
@@ -211,6 +213,9 @@ onUnmounted(() => {
               @scroll-to-ref="scrollToRef"
             >
             </formTypeE>
+            <span v-else-if="rl.formType === 'unknown2'" class="non2">
+              {{ rl.rawRl }}</span
+            >
             <span v-else class="non"> {{ rl.rawRl }}</span>
           </span>
         </div>
@@ -294,6 +299,10 @@ onUnmounted(() => {
 
 .non {
   color: #d9ea79;
+}
+
+.non2 {
+  color: #37f49c;
 }
 
 .focus-line {

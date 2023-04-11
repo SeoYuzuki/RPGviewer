@@ -1,0 +1,28 @@
+     H*
+     H* UPDATE STUDENT MASTER WITH ENROLLED COURSES
+     H*
+     FCOURSES IPE F6300  63           ETAPE         S
+     FSTMASTR UC  F 250 250R 7KI     2 DISK14       S
+     FREPORT  O   F 132 132     OF    LPRINTER
+     EAAC1COURSES STMASTR
+     LREPORT    101 6012
+     ICOURSES AA  01
+     I                                        1   7 IDENT   C1
+     I                                        9  14 CN1
+     I                                        9  140CN1N            11
+     I                                       16  21 CN2
+     I                                       16  210CN2N            12
+     I                                       23  28 CN3
+     I                                       23  280CN3N            13
+     I                                       30  35 CN4
+     I                                       30  350CN4N            14
+     I                                       37  42 CN5
+     I                                       37  420CN5N            15
+     I                                       44  49 CN6
+     I                                       44  490CN6N            16
+     I                                       51  56 CN7
+     I                                       51  560CN7N            17
+     I                                       58  63 CN8
+     I                                       58  630CN8N            18
+     ISTMASTR BB  02   
+     I                                        9  43 NAME

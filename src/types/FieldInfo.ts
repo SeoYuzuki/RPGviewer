@@ -3,8 +3,8 @@
  */
 class FieldInfo {
     position: number;
-    fieldName: string;
-    reason: string;
+    fieldName: string | undefined;    // 不該空
+    reason: string; // 預計刪除
 
     info: {
         /** 提示框內容 */
