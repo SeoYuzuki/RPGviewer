@@ -12,6 +12,8 @@ import {
     , parseNamedConstantSpecifications
 } from "./parseI"
 
+import { parseContinuationLines, parseFileDescriptionSpecification } from "./parseF"
+
 /** https://www.ibm.com/docs/en/rdfi/9.6.0?topic=rpg400-language-reference#ToC_286 */
 
 const parseRpgFile = function (_rpgFile: string) {
@@ -22,11 +24,31 @@ const parseRpgFile = function (_rpgFile: string) {
         // C卡
         if (rl[6] !== '*') {
             if (rl[5] === 'F') {
-                parsedRpgFile.push({
-                    index: i,
-                    rawRl: rl,
-                    formType: "unknown2",
-                });
+                let ezCut = ezCutUtil(rl);
+                if (ezCut(53, 53) !== 'K') {
+                    parsedRpgFile.push({
+                        index: i,
+                        rawRl: rl,
+                        formType: "F",
+                        formTypeSpecifications: "File_Description",
+                        contentMap: parseFileDescriptionSpecification(rl)
+                    });
+                } else if (ezCut(53, 53) === 'K') {
+                    parsedRpgFile.push({
+                        index: i,
+                        rawRl: rl,
+                        formType: "F",
+                        formTypeSpecifications: "Continuation_Lines",
+                        contentMap: parseContinuationLines(rl)
+                    });
+                }
+                else {
+                    parsedRpgFile.push({
+                        index: i,
+                        rawRl: rl,
+                        formType: "unknown2",
+                    });
+                }
             } else if (rl[5] === 'E') {
                 // Extension Specification 
                 parsedRpgFile.push({

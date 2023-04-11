@@ -1,10 +1,18 @@
+_________1_________2_________3_________4_________5_________6_________7_________8
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
      FCPTMFU  IF  E           K        DISK                               comment
      FCPMCDD  IF  E           K        DISK                               comment
      FCLTGSO03IF  E           K        DISK                               comment
+.....F*...........Ext-record..................RcdnbrKOptionEntry+++....
      F            TGSOR                             KRENAMETGSOR3         comment
      FWORK    UF  E           K        DISK                      A        comment
      FWORK2   IF  E           K        DISK                      A        comment
-
+     F* Externally described file (FX prompt)
+     F*ilenameIPEAF........L..I........Device+......KExit++Entry+A....U
+     FSOMEFILEIFEAE        L  K        DISK                      A    UC  comment
+      *
+     F* Program described file (F prompt)
+     FSOMEFIL2OPEDF           ATOV    LPRINTER                   A    U6  comment
 
 
 
