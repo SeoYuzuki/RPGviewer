@@ -21,7 +21,13 @@ const parseRpgFile = function (_rpgFile: string) {
         let rl = rpgFile[i];
         // C卡
         if (rl[6] !== '*') {
-            if (rl[5] === 'E') {
+            if (rl[5] === 'F') {
+                parsedRpgFile.push({
+                    index: i,
+                    rawRl: rl,
+                    formType: "unknown2",
+                });
+            } else if (rl[5] === 'E') {
                 // Extension Specification 
                 parsedRpgFile.push({
                     index: i,
@@ -78,7 +84,10 @@ const parseRpgFile = function (_rpgFile: string) {
                         });
                     }
                     i = i + j - 1;
-                } else if (isBlank(ezCut(42, 74)) && isNotBlank(ezCut(7, 14)) && ezCut(19, 20) != 'DS') {
+                } else if (
+                    isBlank(ezCut(42, 74))
+                    // && isNotBlank(ezCut(7, 14))
+                    && ezCut(19, 20) != 'DS') {
                     /** Input spec record identification (I prompt) */
                     parsedRpgFile.push({
                         index: i,

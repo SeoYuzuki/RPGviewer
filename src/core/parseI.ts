@@ -11,7 +11,7 @@ function parseRecordIdentificationEntries_I(rl: string): Map<string, RPGContent>
     contentMap.set('HEAD_COMMENT', { value: ezCut(1, 5), class: "comments" });
     contentMap.set('Form Type', { value: ezCut(6, 6), view: "KeywordField", dic: "Form_Type_Dic" });
     contentMap.set('File Name', { value: ezCut(7, 14), view: "ParameterField" });
-    contentMap.set('Logical Relationship', { value: ezCut(14, 16) });
+    contentMap.set('Sequence', { value: ezCut(15, 16) });
     contentMap.set('Number', { value: ezCut(17, 17) });
     contentMap.set('Option', { value: ezCut(18, 18) });
     contentMap.set('Record Identifying Indicator', { value: ezCut(19, 20) });
@@ -30,6 +30,8 @@ function parseRecordIdentificationEntries_I(rl: string): Map<string, RPGContent>
     contentMap.set('Character3', { value: ezCut(41, 41) });
 
     contentMap.set('Reserved', { value: ezCut(42, 42) });
+    contentMap.set('Reserved?', { value: ezCut(43, 74) });
+    contentMap.set('Comments', { value: ezCut(75, 80), class: "comments" });
     return contentMap;
 }
 
@@ -52,7 +54,7 @@ function parseFieldDescriptionEntries_J(rl: string): Map<string, RPGContent> {
     contentMap.set('Field Record Relation', { value: ezCut(63, 64) });
     contentMap.set('Field Indicators - Program Described', { value: ezCut(65, 70) });
     contentMap.set('Reserved', { value: ezCut(71, 74) });
-    contentMap.set('Comments', { value: ezCut(75, 80) });
+    contentMap.set('Comments', { value: ezCut(75, 80), class: "comments" });
 
     return contentMap;
 }
@@ -72,7 +74,7 @@ function parseRecordIdentificationEntries_IX(rl: string): Map<string, RPGContent
     contentMap.set('Record Identifying Indicator', { value: ezCut(19, 20) });
     contentMap.set('Record Identification Code', { value: ezCut(21, 41) }); // must be blank
     contentMap.set('Reserved2', { value: ezCut(42, 74) });
-    contentMap.set('Comments', { value: ezCut(75, 80) });
+    contentMap.set('Comments', { value: ezCut(75, 80), class: "comments" });
     return contentMap;
 }
 
@@ -97,7 +99,7 @@ function parseFieldDescriptionEntries_JX(rl: string): Map<string, RPGContent> {
     contentMap.set('Reserved3', { value: ezCut(63, 64) });
     contentMap.set('Externally Described Field Indicators', { value: ezCut(65, 70) });
     contentMap.set('Reserved4', { value: ezCut(71, 74) });
-    contentMap.set('Comments', { value: ezCut(75, 80) });
+    contentMap.set('Comments', { value: ezCut(75, 80), class: "comments" });
     return contentMap;
 }
 
@@ -119,13 +121,13 @@ function parseDataStructureSpecificationEntries(rl: string): Map<string, RPGCont
     contentMap.set('Reserved1', { value: ezCut(13, 16) });
     contentMap.set('External Description', { value: ezCut(17, 17) });
     contentMap.set('Option', { value: ezCut(18, 18) });
-    contentMap.set('Record Identifying Indicator', { value: ezCut(19, 20) });
+    contentMap.set('Record Identifying Indicator', { value: ezCut(19, 20), view: "KeywordField", dic: "Record_Identifying_Indicator_Dic" }); // DS 
     contentMap.set('External File Name', { value: ezCut(21, 30) });
     contentMap.set('Reserved2', { value: ezCut(31, 43) });
     contentMap.set('Data Structure Occurrences', { value: ezCut(44, 47) });
     contentMap.set('Length', { value: ezCut(48, 51) });
     contentMap.set('Reserved3', { value: ezCut(52, 74) });
-    contentMap.set('Comments', { value: ezCut(75, 80) });
+    contentMap.set('Comments', { value: ezCut(75, 80), class: "comments" });
 
     return contentMap;
 }
@@ -150,7 +152,7 @@ function parseDataStructureSubfieldSpecifications(rl: string): Map<string, RPGCo
         contentMap.set('Decimal Positions', { value: ezCut(52, 52) });
         contentMap.set('Field Name', { value: ezCut(53, 58), view: "ParameterField" });
         contentMap.set('Reserved4', { value: ezCut(59, 74) });
-        contentMap.set('Comments', { value: ezCut(75, 80) });
+        contentMap.set('Comments', { value: ezCut(75, 80), class: "comments" });
     } else {
         contentMap.set('HEAD_COMMENT', { value: ezCut(1, 5), class: "comments" });
         contentMap.set('Form Type', { value: ezCut(6, 6), view: "KeywordField", dic: "Form_Type_Dic" });
@@ -164,7 +166,7 @@ function parseDataStructureSubfieldSpecifications(rl: string): Map<string, RPGCo
         contentMap.set('Decimal Positions', { value: ezCut(52, 52) });
         contentMap.set('Field Name', { value: ezCut(53, 58), view: "ParameterField" });
         contentMap.set('Reserved4', { value: ezCut(59, 74) });
-        contentMap.set('Comments', { value: ezCut(75, 80) });
+        contentMap.set('Comments', { value: ezCut(75, 80), class: "comments" });
     }
 
 
@@ -187,6 +189,7 @@ function parseNamedConstantSpecifications(rl: string): Map<string, RPGContent> {
     contentMap.set('Reserved2', { value: ezCut(44, 52) });
     contentMap.set('Constant Name', { value: ezCut(53, 58), view: "ParameterField" });
     contentMap.set('Reserved3', { value: ezCut(59, 74) });
+    contentMap.set('Comments', { value: ezCut(75, 80), class: "comments" });
     return contentMap;
 }
 

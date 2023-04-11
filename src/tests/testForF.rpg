@@ -1,0 +1,19 @@
+     FCPTMFU  IF  E           K        DISK                               comment
+     FCPMCDD  IF  E           K        DISK                               comment
+     FCLTGSO03IF  E           K        DISK                               comment
+     F            TGSOR                             KRENAMETGSOR3         comment
+     FWORK    UF  E           K        DISK                      A        comment
+     FWORK2   IF  E           K        DISK                      A        comment
+
+
+
+
+
+
+
+
+
+
+
+
+
