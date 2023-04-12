@@ -31,9 +31,9 @@ async function handleUploadDDS(file: File): Promise<boolean> {
     parsedRpgFile.value = parseDdsFile(res);
     let dssInfo: DssInfo = {
       parsedLineList: parsedRpgFile.value,
-      name: file.name,
+      name: file.name.split('.')[0],
     };
-    dssInfoMap.value.set(file.name, dssInfo);
+    dssInfoMap.value.set(file.name.split('.')[0].trim(), dssInfo);
   } catch (e) {
     console.log(e);
   }
@@ -106,9 +106,7 @@ function scrollToRef(position: number, _prevPosition: number) {
     prevPosition = _prevPosition;
   }
 }
-function openDds(name: string) {
-  console.log(name);
-}
+
 
 /** 是否顯示十字線 */
 let openAuxiliaryCross = ref<boolean>(false);
@@ -152,11 +150,12 @@ onUnmounted(() => {
 let isShowDdsInfo = ref<boolean>(false);
 let targetDssInfo = ref<DssInfo>();
 function showDdsInfo(key: string) {
-  console.log("showDdsInfo", key);
+  console.log("showDdsInfo", key, dssInfoMap.value);
   isShowDdsInfo.value = true;
-
-  targetDssInfo.value = dssInfoMap.value.get(key);
+  targetDssInfo.value = dssInfoMap.value.get(key.trim());
 }
+
+
 </script>
 
 <template>
@@ -165,91 +164,78 @@ function showDdsInfo(key: string) {
   </Drawer>
   <Row :gutter="16">
     <!-- <Col span="10">
-      <input type="file" ref="file" @change="readFile($event)" />
-    </Col> -->
+                                      <input type="file" ref="file" @change="readFile($event)" />
+                                           </Col> -->
     <Upload multiple :before-upload="handleUploadDDS">
       <Button icon="ios-cloud-upload-outline">upload DDS file</Button>
     </Upload>
-    <Button @click="isShowDrawer = true" type="primary">Left</Button>
+    <Button @click="isShowDrawer = true" type="primary">right</Button>
+    <Button @click="isShowDdsInfo = !isShowDdsInfo" type="primary">{{ isShowDdsInfo }}</Button>
     <Upload :before-upload="handleUpload">
       <Button icon="ios-cloud-upload-outline">upload RPG file</Button>
     </Upload>
     <!-- <Col span="4">
-      跳至
-      <i-Input
-        ref="jumpLine"
-        v-model="lineValue"
-        placeholder="alt + l"
-        style="width: 100px"
-        @keypress="jumpToLine"
-      >
-      </i-Input>
-      行
-    </Col> -->
+                                         跳至
+                                         <i-Input
+                                           ref="jumpLine"
+                                           v-model="lineValue"
+                                           placeholder="alt + l"
+                                           style="width: 100px"
+                                           @keypress="jumpToLine"
+                                         >
+                                         </i-Input>
+                                         行
+                                       </Col> -->
     <Col span="5">
-      十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
+    十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
     </Col>
     <Col span="3">
-      <Button type="primary" @click="isShowReadMe = true">Read Me</Button>
+    <Button type="primary" @click="isShowReadMe = true">Read Me</Button>
     </Col>
   </Row>
   <Row :gutter="0">
     <Col span="18">
-      {{
-        "_____________________1_________2_________3_________4_________5_________6_________7_________8"
-      }}</Col
-    >
+    {{
+      "_____________________1_________2_________3_________4_________5_________6_________7_________8"
+    }}</Col>
     <Col span="18">
-      {{
-        "____________12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-      }}</Col
-    >
+    {{
+      "____________12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+    }}</Col>
     <Col span="18"> {{ "_______INDEX" }}{{ selectedBar }} </Col>
     <Col span="6">
-      <Select v-model="selectedBarModel" style="width: 250px" size="small">
-        <i-Option
-          v-for="item in FORM_TYPE_BAR_LIST"
-          :value="item.value"
-          :key="item.value"
-        >
-          <span>{{ item.label }}</span>
-          <span style="float: right; color: #ccc">{{ item.value }}</span>
-        </i-Option>
-      </Select>
+    <Select v-model="selectedBarModel" style="width: 250px" size="small">
+      <i-Option v-for="item in FORM_TYPE_BAR_LIST" :value="item.value" :key="item.value">
+        <span>{{ item.label }}</span>
+        <span style="float: right; color: #ccc">{{ item.value }}</span>
+      </i-Option>
+    </Select>
     </Col>
   </Row>
 
   <div class="text-block0">
     <div class="container">
       <div class="cont_elements">
-        <div
-          v-for="(rl, index) in parsedRpgFile"
-          :class="getElementClass(index)"
-          :ref="
-            (el) => {
-              divs[index] = el;
-            }
-          "
-          @click="onElementClicked(rl, index)"
-        >
+        <div v-for="(rl, index) in parsedRpgFile" :class="getElementClass(index)" :ref="
+          (el) => {
+            divs[index] = el;
+          }
+        " @click="onElementClicked(rl, index)">
           <!-- {{ rl.rawRl }} -->
           <Poptip :title="'title'" width="500">
             <template #content> {{ rl }}</template>
 
-            {{ "      " + (index + 1).toString().padStart(5, "0") }}
+            {{ " " + (index + 1).toString().padStart(5, "0") }}
           </Poptip>
           <!-- 整行註解 -->
           <span v-if="rl.formType === 'comments'" class="comments">
-            {{ rl.rawRl }}</span
-          >
+            {{ rl.rawRl }}</span>
           <span v-else>
-            <FormTypeAll :rl="rl" :fieldInfoList="fieldInfoList" />
+            <FormTypeAll :rl="rl" :fieldInfoList="fieldInfoList" @open-dds="showDdsInfo" />
             <span v-if="rl.formType === 'unknown'" class="non">
-              {{ rl.rawRl }}</span
-            >
+              {{ rl.rawRl }}</span>
             <span v-if="rl.formType === 'unknown2'" class="non2">
-              {{ rl.rawRl }}</span
-            >
+              {{ rl.rawRl }}</span>
           </span>
         </div>
       </div>
@@ -276,56 +262,33 @@ function showDdsInfo(key: string) {
       <Col span="14"> 回到跳轉之前的位置 </Col>
     </Row>
   </Modal>
-  <Modal
-    v-model="isShowDdsInfo"
-    footer-hide
-    draggable
-    sticky
-    scrollable
-    width="900"
-    :transfer="false"
-    :mask="false"
-    :title="targetDssInfo?.name"
-  >
-    <div class="text-block0">
+  <Modal v-model="isShowDdsInfo" footer-hide draggable sticky scrollable width="500" :mask="false"
+    :title="targetDssInfo?.name">
+    <div class="text-block1">
       <div class="container">
         <div class="cont_elements">
-          <div
-            v-for="(rl, index) in targetDssInfo?.parsedLineList"
-            :class="getElementClass(index)"
-            :ref="
-              (el) => {
-                divs[index] = el;
-              }
-            "
-            @click="onElementClicked(rl, index)"
-          >
+          <div v-for="(rl, index) in targetDssInfo?.parsedLineList" :class="getElementClass(index)" :ref="
+            (el) => {
+              divs[index] = el;
+            }
+          ">
+            <!--  @click="onElementClicked(rl, index)" -->
             <!-- {{ rl.rawRl }} -->
             <Poptip :title="'title'" width="500">
               <template #content> {{ rl }}</template>
 
-              {{ "      " + (index + 1).toString().padStart(5, "0") }}
+              {{ " " + (index + 1).toString().padStart(5, "0") }}
             </Poptip>
             <!-- 整行註解 -->
             <span v-if="rl.formType === 'comments'" class="comments">
-              {{ rl.rawRl }}</span
-            >
+              {{ rl.rawRl }}</span>
             <span v-else>
-              <FormTypeAll
-                :rl="rl"
-                :fieldInfoList="fieldInfoList"
-                @openDds="
-                  (name) => {
-                    showDdsInfo(name);
-                  }
-                "
-              ></FormTypeAll>
+              <FormTypeAll :rl="rl" :fieldInfoList="fieldInfoList">
+              </FormTypeAll>
               <span v-if="rl.formType === 'unknown'" class="non">
-                {{ rl.rawRl }}</span
-              >
+                {{ rl.rawRl }}</span>
               <span v-if="rl.formType === 'unknown2'" class="non2">
-                {{ rl.rawRl }}</span
-              >
+                {{ rl.rawRl }}</span>
             </span>
           </div>
         </div>
@@ -341,6 +304,17 @@ function showDdsInfo(key: string) {
   color: rgb(255, 255, 255);
   height: 95%;
   width: 100%;
+  /* position: absolute;
+      width: 100%;
+      left: 5%; */
+}
+
+.text-block1 {
+  background-color: rgb(42, 42, 42);
+  color: rgb(255, 255, 255);
+  /* height: 500px; */
+  /* width: 700px; */
+  font-family: "MingLiU";
   /* position: absolute;
       width: 100%;
       left: 5%; */

@@ -59,8 +59,7 @@ function getfield_info() {
 
 function onClick(e: MouseEvent) {
   if (e.ctrlKey) {
-    if (targetFieldInfo?.info.openDss) {
-      console.log(123);
+    if (targetFieldInfo?.info.openDss) {  
       emit("openDds", targetFieldInfo?.info.openDss);
       return;
     }

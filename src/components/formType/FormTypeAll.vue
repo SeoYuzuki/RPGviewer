@@ -18,9 +18,7 @@ function scrollToRef(position: number, prevPosition: number) {
 }
 
 function openDds(name: string) {
-  console.log("12222222222", name);
   emit("openDds", name);
-  console.log("333333333333", name);
 }
 </script>
 
@@ -28,19 +26,11 @@ function openDds(name: string) {
   <span>
     <template v-for="[key, value] in rl.contentMap">
       <template v-if="value.view === 'KeywordField'">
-        <KeywordField
-          :keyword="value.value"
-          :dictionary="value.dic"
-        ></KeywordField>
+        <KeywordField :keyword="value.value" :dictionary="value.dic"></KeywordField>
       </template>
       <template v-else-if="value.view === 'ParameterField'">
-        <ParameterField
-          :field-info-list="fieldInfoList"
-          :field_text="value.value"
-          :index="rl.index"
-          @scroll-to-ref="scrollToRef"
-          @openDds="openDds"
-        ></ParameterField>
+        <ParameterField :field-info-list="fieldInfoList" :field_text="value.value" :index="rl.index"
+          @scroll-to-ref="scrollToRef" @openDds="openDds"></ParameterField>
       </template>
       <span v-else :class="value.class">{{ value.value }}</span>
     </template>
