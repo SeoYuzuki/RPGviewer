@@ -257,7 +257,7 @@ function showDdsInfo(key: string) {
   </div>
   <Modal v-model="isShowReadMe" title="RPG小助手 1.1.0">
     <Row :gutter="16">
-      <Col span="24"> 目前主要支援E I C 規格 </Col>
+      <Col span="24"> 目前主要支援F E I C 規格 </Col>
     </Row>
     <Row :gutter="16">
       <Col span="8">左鍵有顏色之關鍵字:</Col>
