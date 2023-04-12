@@ -7,12 +7,9 @@ import { getFieldInfoList } from "../core/FieldInfoParser";
 import { ParsedLine } from "../types/parsedRpgFile";
 import { FORM_TYPE_BAR_LIST } from "../dictionary/RPG_dictionary";
 
-import formTypeC from "./formType/FormTypeC.vue";
-import formTypeE from "./formType/formTypeE.vue";
-import formTypeF from "./formType/formTypeF.vue";
-import formTypeI from "./formType/formTypeI.vue";
+import FormTypeAll from "./formType/FormTypeAll.vue";
+
 import { Button } from "view-ui-plus";
-import { FormType } from "../types/FormType";
 import { FieldInfo } from "../types/FieldInfo";
 
 let lineValue: string = "";
@@ -55,7 +52,7 @@ function getElementClass(index: number) {
 }
 
 function onElementClicked(rl: ParsedLine, index: number) {
-  console.log(index, rl);
+  console.log(rl.formTypeSpecifications, index, rl);
   lineClicked.value = index;
   if (rl.formTypeSpecifications) {
     selectedBarModel.value = rl.formTypeSpecifications;
@@ -63,7 +60,7 @@ function onElementClicked(rl: ParsedLine, index: number) {
 }
 const selectedBar = computed(() => {
   if (selectedBarModel.value) {
-    console.log(selectedBarModel.value);
+    //console.log(selectedBarModel.value);
     return (
       FORM_TYPE_BAR_LIST.find((e) => e.value === selectedBarModel.value)?.bar ??
       ""
@@ -151,6 +148,16 @@ onUnmounted(() => {
     </Col>
   </Row>
   <Row :gutter="0">
+    <Col span="18">
+      {{
+        "_____________________1_________2_________3_________4_________5_________6_________7_________8"
+      }}</Col
+    >
+    <Col span="18">
+      {{
+        "____________12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+      }}</Col
+    >
     <Col span="18"> {{ "_______INDEX" }}{{ selectedBar }} </Col>
     <Col span="6">
       <Select v-model="selectedBarModel" style="width: 250px" size="small">
@@ -190,28 +197,13 @@ onUnmounted(() => {
             {{ rl.rawRl }}</span
           >
           <span v-else>
-            <formTypeC
-              v-if="rl.formType === 'C'"
-              :rl="rl"
-              :fieldInfoList="fieldInfoList"
-              @scroll-to-ref="scrollToRef"
+            <FormTypeAll :rl="rl" :fieldInfoList="fieldInfoList" />
+            <span v-if="rl.formType === 'unknown'" class="non">
+              {{ rl.rawRl }}</span
             >
-            </formTypeC>
-            <formTypeI
-              v-else-if="rl.formType === 'I'"
-              :rl="rl"
-              :field_info="fieldInfoList"
-              @scroll-to-ref="scrollToRef"
+            <span v-if="rl.formType === 'unknown2'" class="non2">
+              {{ rl.rawRl }}</span
             >
-            </formTypeI>
-            <formTypeE
-              v-else-if="rl.formType === 'E'"
-              :rl="rl"
-              :fieldInfoList="fieldInfoList"
-              @scroll-to-ref="scrollToRef"
-            >
-            </formTypeE>
-            <span v-else class="non"> {{ rl.rawRl }}</span>
           </span>
         </div>
       </div>
@@ -294,6 +286,10 @@ onUnmounted(() => {
 
 .non {
   color: #d9ea79;
+}
+
+.non2 {
+  color: #37f49c;
 }
 
 .focus-line {

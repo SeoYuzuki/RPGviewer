@@ -43,7 +43,7 @@ function getStaticFieldClass() {
     return "static_number italic";
   }
 
-  return "";
+  return "temp";
 }
 function getfield_info() {
   if (targetFieldInfo) {
@@ -92,11 +92,15 @@ function handleMouseEvent(e: any) {
   color: #75c4f1e8;
 }
 
+.file {
+  color: #e22d2d;
+}
+
 .record {
   color: #e22d2d;
 }
 
-.data_structure {
+.data-structure {
   color: #eb15ab;
 }
 
@@ -114,5 +118,9 @@ function handleMouseEvent(e: any) {
 
 .comments {
   color: #3ba000;
+}
+
+.temp {
+  color: #8b7d87;
 }
 </style>

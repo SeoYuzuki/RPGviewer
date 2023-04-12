@@ -15,8 +15,7 @@ const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
                 if (map.get("Field_Length")?.value?.trim()) {
                     fieldInfoList.push({
                         position: rl.index,
-                        fieldName: map.get("Result_Field")?.value ?? "",
-                        reason: "Field_Length",
+                        fieldName: map.get("Result_Field")?.value,
                         info: {
                             content: "A field with a length of " +
                                 map.get("Field_Length")?.value + ',' +
@@ -29,9 +28,7 @@ const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
                 if (map.get("Opcde")?.value === 'BEGSR') {
                     fieldInfoList.push({
                         position: rl.index,
-                        fieldName: map.get("Factor1")?.value ?? "",
-                        reason: "BEGSR",
-
+                        fieldName: map.get("Factor1")?.value,
                         info: {
                             content: "Subroutine.",
                             title: ""
@@ -53,9 +50,7 @@ const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
 
                     fieldInfoList.push({
                         position: rl.index,
-                        fieldName: map.get("Factor1")?.value ?? "",
-                        reason: "KLIST",
-
+                        fieldName: map.get("Factor1")?.value,
                         info: {
                             content: "KLIST with KFLD: " + kfld,
                             title: ""
@@ -64,85 +59,75 @@ const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
                 }
             }
         } else if (rl.formType === 'I') {
-            if (rl.formTypeSpecifications === "Data_Structure" && isNotBlank(rl.formContent.Data_Structure_Name)) {
-                fieldInfoList.push({
-                    position: rl.index,
-                    fieldName: rl.formContent.Data_Structure_Name,
-                    reason: "I_Data_Structure",
-
-                    info: {
-                        content: "Data structure.",
-                        title: "",
-                        class: 'data_structure'
-                    }
-                });
-            }
-            else if (rl.formTypeSpecifications === "Data_Structure_Subfield") {
-                let Data_Structure_Name = "";
-                for (let k = 1; ; k++) {
-                    let temp_rl = noCommentsRpg[count - k];
-                    if (temp_rl.formTypeSpecifications === 'Data_Structure') {
-                        Data_Structure_Name = temp_rl.formContent.Data_Structure_Name;
-                        break;
-                    }
+            if (rl.contentMap) {
+                let map: Map<String, RPGContent> = rl.contentMap;
+                if (rl.formTypeSpecifications === "Record_Identification") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("File Name")?.value,
+                        info: {
+                            content: "File",
+                            title: "",
+                            class: "file"
+                        }
+                    });
+                } else if (rl.formTypeSpecifications === "Field_Description") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Field Name")?.value,
+                        info: {
+                            content: "field of File",
+                            title: "",
+                        }
+                    });
+                } else if (rl.formTypeSpecifications === "Record_Identification_External") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Record Name")?.value,
+                        info: {
+                            content: "Record",
+                            class: "record",
+                            title: "",
+                        }
+                    });
+                } else if (rl.formTypeSpecifications === "Field_Description_External") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Field Name")?.value,
+                        info: {
+                            content: "Field of record.",
+                            title: "",
+                        }
+                    });
+                } else if (rl.formTypeSpecifications === "Data_Structure") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Data Structure Name")?.value,
+                        info: {
+                            content: "Data Structure.",
+                            class: "data-structure",
+                            title: "",
+                        }
+                    });
+                } else if (rl.formTypeSpecifications === "Data_Structure_Subfield") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Field Name")?.value,
+                        info: {
+                            content: "Field Name",
+                            title: "",
+                        }
+                    });
+                } else if (rl.formTypeSpecifications === "Named_Constant") {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("Constant Name")?.value,
+                        info: {
+                            content: "Constant Name",
+                            title: "",
+                        }
+                    });
                 }
-
-                fieldInfoList.push({
-                    position: rl.index,
-                    fieldName: rl.formContent.Field_Name,
-                    reason: "I_Subfield",
-
-                    info: {
-                        content: isBlank(Data_Structure_Name) ? "Subfield." : "Subfield from structure " + Data_Structure_Name,
-                        title: ""
-                    }
-                });
-            } else if (rl.formTypeSpecifications === "Record_Identification") {
-                fieldInfoList.push({
-                    position: rl.index,
-                    fieldName: rl.formContent.Record_Name,
-                    reason: "I_RECORD",
-
-                    info: {
-                        content: "Record.",
-                        title: "",
-                        class: "record"
-                    }
-                });
-            } else if (rl.formTypeSpecifications === "Field_Description") {
-                let Record_Name = "";
-                for (let k = 1; ; k++) {
-                    let temp_rl = noCommentsRpg[count - k];
-                    if (temp_rl.formTypeSpecifications === 'Record_Identification') {
-                        Record_Name = temp_rl.formContent.Record_Name;
-                        break;
-                    }
-                }
-
-                fieldInfoList.push({
-                    position: rl.index,
-                    fieldName: rl.formContent.Field_Name,
-                    reason: "I_Field_Description",
-
-                    info: {
-                        content: "A field from record named " +
-                            Record_Name +
-                            ". Original field name is " +
-                            rl.formContent.External_Field_Name,
-                        title: ""
-                    }
-                });
-            } else if (rl.formTypeSpecifications === "Named_Constant") {
-                fieldInfoList.push({
-                    position: rl.index,
-                    fieldName: rl.formContent.Constant_Name,
-                    reason: "I_Constant_Name",
-
-                    info: {
-                        content: "This is a constant whose value is " + rl.formContent.Constant,
-                        title: ""
-                    }
-                });
             }
         } else if (rl.formType === 'E') {
             if (rl.contentMap) {
@@ -151,8 +136,6 @@ const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
                     fieldInfoList.push({
                         position: rl.index,
                         fieldName: map.get("Array_or_Table_Name1")?.value ?? "",
-                        reason: "E_Array_or_Table_Name1",
-
                         info: {
                             content: (
                                 "It's a Array or Table.\r\n" +

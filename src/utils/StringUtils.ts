@@ -50,6 +50,17 @@ function substr_by_bytes(str: string, startInBytes: number, lengthInBytes: numbe
     return resultStr;
 }
 
+/**
+ * 以ibm網站上的描述法切割字串，帶入愈切割的字串，取得一個function，
+ * 該function 可帶入第幾個位置即可切割
+ * @param rl 愈切割的字串
+ */
+function ezCutUtil(rl: string): (a: number, b: number) => string {
+    return (a: number, b: number): string => {
+        return substr_by_bytes(rl, a - 1, b - a + 1);
+    }
+}
+
 function isEmpty(str: string) {
     return (!str || str.length === 0);
 }
@@ -64,4 +75,4 @@ function isNotBlank(str: string) {
 
 
 
-export { substr_by_bytes, isEmpty, isBlank, isNotBlank }
+export { substr_by_bytes, ezCutUtil, isEmpty, isBlank, isNotBlank }

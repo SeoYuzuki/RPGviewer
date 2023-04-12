@@ -1,0 +1,39 @@
+     H* RPG Tutorial: Example Program 2 - Copy Cards to Tape
+     H
+     H*
+     H* MERGE CUSTOMER CARDS (1-2-3) CREATING CUSTOMER TAPE
+     H*
+     FINCARDS IPE F  80  80            READ40
+     FOUTTAPE O   F2900 116            TAPE         S
+     IINCARDS 011 01   1 C1
+     I                                        3   90CUST#
+     I                                       11  21 FNAME
+     I                                       23  23 INITL
+     I                                       25  34 LNAME
+     I                                       36  60 ADDR
+     I        021 02   1 C2
+     I                                        3   90CUST#
+     I                                       11  30 CITY
+     I                                       32  33 STATE
+     I                                       35  39 ZIP
+     I        031 03   1 C3
+     I                                        3   90CUST#
+     I                                       11  11 SEX
+     I                                       13  22 PHONE
+     I                                       24  310BDATE
+     I                                       33  400ADATE
+     I                                       42  490LDATE
+     OOUTTAPE D        03
+     O                         LDATE    116
+     O                         ADATE    108
+     O                         BDATE    100
+     O                         PHONE     92
+     O                         SEX       82
+     O                         ZIP       81
+     O                         STATE     76
+     O                         CITY      74
+     O                         ADDR      54
+     O                         LNAME     29
+     O                         INITL     19
+     O                         FNAME     18
+     O                         CUST#      7

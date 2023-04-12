@@ -3,9 +3,7 @@
  */
 class FieldInfo {
     position: number;
-    fieldName: string;
-    reason: string;
-
+    fieldName: string | undefined;    // 不該空
     info: {
         /** 提示框內容 */
         content: string,

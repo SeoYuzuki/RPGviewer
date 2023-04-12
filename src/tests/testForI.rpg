@@ -1,0 +1,81 @@
+     IMCARR                                                               comment
+     I              ISDT                            @ISDT                 comment
+     I              CHGDT                           @CHGDT                comment
+      *---------------------------------------------------------------*
+     IMVPCR                                                               comment
+     I              VIPNO                           VPC01                 comment
+     I              VIPTP                           VPC02                 comment
+      *---------------------------------------------------------------*   comment
+     I           SDS                                                      comment
+     I                                     *PROGRAM MSGQ                  comment
+     I                                      254 263 USRID                 comment
+     I                                      254 259 USRID1                comment
+      *---------------------------------------------------------------*   comment
+     I           UDS                                                      comment
+     I                                       33  42 #SRMBR                comment
+     I                                      170 179 #WSID                 comment
+      *---------------------------------------------------------------*   comment
+     I#0E0F       DS                                                      comment
+     I                                        1   1 #0E                   comment
+     I                                        2   2 #0F                   comment
+      *---------------------------------------------------------------*   comment
+     I            DS                                                      comment
+     I I            ' Ｘ '                    1   4 #MASK                 comment
+     I                                        2   3 #MASK1                comment
+     I            DS                                                      comment
+     I                                        1  11 PCHID                 comment
+     I                                        4   8 PCHID1                comment
+     I*The following is an example of a character constant:               comment
+     I              'MICKEY'              C         MOUSE                 comment
+     ******************************************************************** comment
+     IINVHDR  NS  01   1NC                                                comment
+     I                                        1   3 STORE L1              comment
+     I                                        4  13 INVNO                 comment
+     I           UDS                                                      comment
+     I                                        1   8 RPTDAT                comment
+     ********************************************************************************
+     I#S0182      DS
+SEQTPI                                        1   2 S1821
+SEQT2I                                        3  22 S1822
+PROC I I            '1'                      23  23 S1823
+FRMT I I            'S'                      24  24 S1824
+LEN  I I            15                       25  260S1825
+YFG  I I            ' '                      27  27 S1826
+FILL2I                                       28  29 S1827
+RSTFGI                                       30  30 S1828
+      *
+CUSEQI                                       31  50 S1829
+     I                                       31  45 S18291
+     ***********************************************************
+     IINCARDS 011 01   1 C1
+     I                                        3   90CUST#
+     I                                       11  21 FNAME
+     I                                       23  23 INITL
+     I                                       25  34 LNAME
+     I                                       36  60 ADDR
+     I        021 02   1 C2
+     I                                        3   90CUST#
+     I                                       11  30 CITY
+     I                                       32  33 STATE
+     I                                       35  39 ZIP
+     I        031 03   1 C3
+     I                                        3   90CUST#
+     I                                       11  11 SEX
+     I                                       13  22 PHONE
+     I                                       24  310BDATE
+     I                                       33  400ADATE
+     I                                       42  490LDATE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
