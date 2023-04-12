@@ -135,7 +135,7 @@ const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
                 if (map.get("Array_or_Table_Name1")) {
                     fieldInfoList.push({
                         position: rl.index,
-                        fieldName: map.get("Array_or_Table_Name1")?.value ?? "",
+                        fieldName: map.get("Array_or_Table_Name1")?.value,
                         info: {
                             content: (
                                 "It's a Array or Table.\r\n" +
@@ -150,6 +150,22 @@ const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
                                 "\r\n"
                             ),
                             title: ""
+                        }
+                    });
+                }
+            }
+        } else if (rl.formType === 'F') {
+            console.log(rl);
+            if (rl.contentMap) {
+                let map: Map<String, RPGContent> = rl.contentMap;
+                if (map.get("File Name")) {
+                    fieldInfoList.push({
+                        position: rl.index,
+                        fieldName: map.get("File Name")?.value,
+                        info: {
+                            content: "File Name",
+                            title: "",
+                            openDss: map.get("File Name")?.value
                         }
                     });
                 }

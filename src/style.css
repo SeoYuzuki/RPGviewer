@@ -65,6 +65,12 @@ button:focus-visible {
   font-size: 16px; */
 }
 
+
+
+.ivu-modal-body{
+  padding: 1px !important
+}
+
 /* @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

@@ -13,6 +13,11 @@ class ParsedLine {
     formContent?: any
 }
 
+class DssInfo {
+    parsedLineList: ParsedLine[]
+    name: string
+}
+
 /**
  * 欄位資訊
  */
@@ -27,4 +32,4 @@ class RPGContent {
     readonly class?: string;
 }
 
-export { RPGContent, ParsedLine };
+export { RPGContent, ParsedLine, DssInfo };

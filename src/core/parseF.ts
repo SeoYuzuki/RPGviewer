@@ -9,9 +9,9 @@ function parseFileDescriptionSpecification(rl: string): Map<string, RPGContent> 
     let contentMap: Map<string, RPGContent> = new Map();
     contentMap.set('HEAD_COMMENT', { value: ezCut(1, 5), class: "comments" });
     contentMap.set('Form Type', { value: ezCut(6, 6), view: "KeywordField", dic: "Form_Type_Dic" });
-    contentMap.set('File Name', { value: ezCut(7, 14) });
+    contentMap.set('File Name', { value: ezCut(7, 14), view: "ParameterField" });
     contentMap.set('File Type', { value: ezCut(15, 15) });
-    contentMap.set('File Designation', { value: ezCut(16, 16) });
+    contentMap.set('File Designation', { value: ezCut(16, 16), view: "KeywordField", dic: "File_Designation_Dic" });
     contentMap.set('End of File', { value: ezCut(17, 17) });
     contentMap.set('Sequence', { value: ezCut(18, 18) });
     contentMap.set('File Format', { value: ezCut(19, 19) });
@@ -112,7 +112,7 @@ function parseContinuationLines(rl: string): Map<string, RPGContent> {
     contentMap.set('Option', { value: ezCut(54, 59) });
     contentMap.set('Option Explanation', { value: ezCut(60, 67) });
     contentMap.set('Reserved3', { value: ezCut(68, 74) }); // must Blank
-    contentMap.set('Comments', { value: ezCut(75, 80) });
+    contentMap.set('Comments', { value: ezCut(75, 80), class: "comments" });
 
     // contentMap.set('temp', { value: ezCut(1, 80) });
     return contentMap;

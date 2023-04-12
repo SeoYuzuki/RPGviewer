@@ -7,6 +7,11 @@ const props = defineProps<{
   field_text: string;
   index: number;
 }>();
+const emit = defineEmits<{
+  (e: "scrollToRef", position: number, prevPosition: number): void;
+  (e: "openDds", name: string): void;
+}>();
+
 // console.log(props.fieldInfoList, props.field_text, props.index);
 let targetFieldInfo = props.fieldInfoList.find(
   (e: any) => e.fieldName.trim() === props.field_text.trim().split(",")[0]
@@ -52,11 +57,13 @@ function getfield_info() {
   return "";
 }
 
-const emit = defineEmits<{
-  (e: "scrollToRef", position: number, prevPosition: number): void;
-}>();
 function onClick(e: MouseEvent) {
   if (e.ctrlKey) {
+    if (targetFieldInfo?.info.openDss) {
+      console.log(123);
+      emit("openDds", targetFieldInfo?.info.openDss);
+      return;
+    }
     emit("scrollToRef", targetFieldInfo?.position ?? 0, props.index);
   }
 }

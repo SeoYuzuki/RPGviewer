@@ -17,9 +17,12 @@ const arraysEqual = function (a: any[], b: any[]) {
  */
 const getContentByFile = async function (file: File): Promise<string> {
     return new Promise(resolve => {
-        if (!file.name.includes(".rpg") && !file.name.includes(".txt")) {
+        if (!file.name.includes(".rpg")
+            && !file.name.includes(".txt")
+            && !file.name.includes(".dds")
+            && !file.name.includes(".pf")) {
             //this.$Message.warning("不合規副檔名");
-            resolve("fail");
+            resolve("副檔名fail");
             return;
         }
 

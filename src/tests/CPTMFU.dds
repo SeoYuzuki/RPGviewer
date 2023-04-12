@@ -1,0 +1,21 @@
+_________1_________2_________3_________4_________5_________6_________7_________8
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+.....A..........T.Name++++++RLen++TDpB......Functions+++++++++++++++++++++++++++
+                                            UNIQUE                                                                                                    
+     A          R TMFUR                     TEXT('AAAAA')                                                                                
+      *                                                                                                                                               
+     A            MKDT           8S 0       COLHDG('BBBB')                                                                                        
+     A                                      TEXT('TBBB')                                                                                          
+     A            MSEQ           2S 0       COLHDG('CCCC')                                                                                        
+     A                                      TEXT('TCCC')                                                                                          
+     A            CHKSQ         10S 0       COLHDG('DDDD')                                                                                      
+     A                                      TEXT('TDDDD')                                                                                        
+     A            MAKTP          2A         COLHDG('特殊123') 
+      *                                                                                                                                               
+     A          K MKDT                                                                                                                                
+     A          K MSEQ                                                                                                                                
+     A          K CHKSQ                                                                                                                               
+     A          K SQNO                                                                                                                                
+     A            TLEXR2    R               COLHDG('Kypc конвертации' 'вапюты +
+     A                                      BIN-A' 'вапюту счета')
+      *===============================================================*    

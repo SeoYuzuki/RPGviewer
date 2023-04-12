@@ -12,6 +12,7 @@ interface KeywordsDic {
     readonly Opcde_Dic: Dic[];
     readonly Record_Identifying_Indicator_Dic: Dic[];
     readonly Data_Type_Dic: Dic[];
+    readonly File_Designation_Dic: Dic[];
 }
 
 const opcdeDictionary: Dic[] = [
@@ -97,6 +98,45 @@ const Record_Identifying_Indicator_Dic: Dic[] = [
         website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh144.htm#HDRISS1920"
     }
 ]
+
+const File_Designation_Dic: Dic[] = [
+    {
+        keyword: " ",
+        title: "Output file",
+        content: "Output file.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh39.html#HDRF16"
+    },
+    {
+        keyword: "P",
+        title: "Primary file",
+        content: "When several files are processed by cycle processing, one must be designated as the primary file. In multifile processing, processing of the primary file takes precedence. Only one primary file is allowed per program.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh39.html#HDRF16"
+    },
+    {
+        keyword: "S",
+        title: "Secondary File",
+        content: "When more than one file is used during cycle-controlled programming, secondary files are input files. The processing of secondary files is determined by the order in which they are specified in the file-description specifications and on the rules of multifile logic.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh39.html#HDRF16"
+    },
+    {
+        keyword: "R",
+        title: "Record Address File",
+        content: "A record-address file is a sequentially organized file used to select records from another file. Only one file in a program can be specified as a record-address file. This file is described on the file-description and extension specifications and not on the input specifications. The file processed by the record-address file must also be specified on the extension specifications and must be a primary, secondary, or full procedural file.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh39.html#HDRF16"
+    },
+    {
+        keyword: "T",
+        title: "Array or table file",
+        content: "Array and table files specified by a T in position 16 are loaded at program initialization time. The array or table file can be input or combined. Leave this entry blank for array or table output files. You cannot specify SPECIAL as the device for array and table input files. You cannot specify an externally described file as an array or table file.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh39.html#HDRF16"
+    },
+    {
+        keyword: "F",
+        title: "Full Procedural File",
+        content: "This entry is used when the input is controlled by calculation operations. File operation codes such as CHAIN or READ are used to do input functions.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh39.html#HDRF16"
+    }
+];
 
 const Data_Type_Dic: Dic[] = [
     {
@@ -184,10 +224,11 @@ const Constants = [
 
 
 const Keywords_Dic: KeywordsDic = {
-    'Form_Type_Dic': Form_Type_Dic,
-    'Opcde_Dic': opcdeDictionary,
-    'Record_Identifying_Indicator_Dic': Record_Identifying_Indicator_Dic,
-    "Data_Type_Dic": Data_Type_Dic
+    Form_Type_Dic: Form_Type_Dic,
+    Opcde_Dic: opcdeDictionary,
+    Record_Identifying_Indicator_Dic: Record_Identifying_Indicator_Dic,
+    Data_Type_Dic: Data_Type_Dic,
+    File_Designation_Dic: File_Designation_Dic
 }
 
 export type { KeywordsDic, FormTypeBar, Dic };

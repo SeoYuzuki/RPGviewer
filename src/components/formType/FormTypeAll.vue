@@ -8,12 +8,19 @@ import { FieldInfo } from "../../types/FieldInfo";
 const props = defineProps<{ rl: ParsedLine; fieldInfoList: FieldInfo[] }>();
 const emit = defineEmits<{
   (e: "scrollToRef", position: number, prevPosition: number): void;
+  (e: "openDds", name: string): void;
 }>();
 
 let formContent = props.rl.formContent;
 
 function scrollToRef(position: number, prevPosition: number) {
-  emit("scrollToRef", position, prevPosition);
+  // emit("scrollToRef", position, prevPosition);
+}
+
+function openDds(name: string) {
+  console.log("12222222222", name);
+  emit("openDds", name);
+  console.log("333333333333", name);
 }
 </script>
 
@@ -32,6 +39,7 @@ function scrollToRef(position: number, prevPosition: number) {
           :field_text="value.value"
           :index="rl.index"
           @scroll-to-ref="scrollToRef"
+          @openDds="openDds"
         ></ParameterField>
       </template>
       <span v-else :class="value.class">{{ value.value }}</span>
