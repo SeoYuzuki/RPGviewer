@@ -71,6 +71,10 @@ button:focus-visible {
   padding: 1px !important
 }
 
+.ivu-drawer-body{
+  background-color: #eaeaea;
+}
+
 /* @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

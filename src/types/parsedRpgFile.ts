@@ -13,9 +13,11 @@ class ParsedLine {
     formContent?: any
 }
 
-class DssInfo {
+class FileInfo {
     parsedLineList: ParsedLine[]
     name: string
+    fileName: string
+    fileExtension: string
 }
 
 /**
@@ -32,4 +34,4 @@ class RPGContent {
     readonly class?: string;
 }
 
-export { RPGContent, ParsedLine, DssInfo };
+export { RPGContent, ParsedLine, FileInfo };

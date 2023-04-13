@@ -1,66 +1,86 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import { getContentByFile } from "../utils/A1Utils";
-import { getAuxiliaryCrossHandler } from "../utils/AuxiliaryCross";
-import { parseRpgFile } from "../core/RpgFileParser";
-import { parseDdsFile } from "../core/DDSFileParser";
-import { getFieldInfoList } from "../core/FieldInfoParser";
-import { DssInfo, ParsedLine } from "../types/parsedRpgFile";
-import { FORM_TYPE_BAR_LIST } from "../dictionary/RPG_dictionary";
+import { Button } from "view-ui-plus";
 
+import { getContentByFile } from "../utils/A1Utils";
+import AuxiliaryCross from "../utils/AuxiliaryCross";
+import { parseRpgFile } from "../core/fileParse/RpgFileParser";
+import { parseDdsFile } from "../core/fileParse/DDSFileParser";
+import { getFieldInfoList } from "../core/FieldInfoParser";
+import { FileInfo, ParsedLine } from "../types/parsedRpgFile";
+import { FORM_TYPE_BAR_LIST } from "../dictionary/RPG_dictionary";
+import { FieldInfo } from "../types/FieldInfo";
+/** components */
 import FormTypeAll from "./formType/FormTypeAll.vue";
 import DssDrawer from "./DssDrawer.vue";
+import ReadMe from "./ReadMe.vue";
 
-import { Button } from "view-ui-plus";
-import { FieldInfo } from "../types/FieldInfo";
-
-let lineValue: string = "";
+let openAuxiliaryCross = AuxiliaryCross().openAuxiliaryCross;
 
 /**
  * 上傳
  */
-let dssInfoMap = ref<Map<string, DssInfo>>(new Map());
+
+/** 上傳的檔案列表 */
+let fileInfoMap = ref<Map<string, FileInfo>>(new Map());
+/** 當前Tab名稱 */
+let targetTabName = ref<string>("");
+/** tab顯示清單 */
+let tabList = ref<FileInfo[]>([]);
+/** 當前渲染程式碼 */
+const parsedRpgFile = computed(() => {
+  return fileInfoMap.value.get(targetTabName.value)?.parsedLineList;
+});
+
 /**
  * 上傳DDS檔案事件
  */
 async function handleUploadDDS(file: File): Promise<boolean> {
   try {
-    console.log(file);
+    let fileExtension = /[.]/.exec(file.name) ? file.name.split(".")[1] : "";
+    let name = file.name.split(".")[0].trim();
+    console.log(file, fileExtension);
+    let dssInfo: FileInfo;
     let res = await getContentByFile(file);
-    console.log(res);
-    parsedRpgFile.value = parseDdsFile(res);
-    let dssInfo: DssInfo = {
-      parsedLineList: parsedRpgFile.value,
-      name: file.name.split('.')[0],
-    };
-    dssInfoMap.value.set(file.name.split('.')[0].trim(), dssInfo);
+    if (["dds", "pf"].includes(fileExtension.toLowerCase())) {
+      let temp = parseDdsFile(res);
+      dssInfo = {
+        parsedLineList: temp,
+        fileName: file.name,
+        name: name,
+        fileExtension: fileExtension,
+      };
+      tabList.value = tabList.value.filter((e) => e.name !== name);
+      tabList.value.push(dssInfo);
+      fileInfoMap.value.set(file.name.split(".")[0].trim(), dssInfo);
+    } else if (["rpg"].includes(fileExtension.toLowerCase())) {
+      // 依照不同From type解析每行
+      let temp = parseRpgFile(res);
+      dssInfo = {
+        parsedLineList: temp,
+        fileName: file.name,
+        name: file.name.split(".")[0],
+        fileExtension: fileExtension,
+      };
+      tabList.value = tabList.value.filter((e) => e.name !== name);
+      tabList.value.push(dssInfo);
+      fileInfoMap.value.set(file.name.split(".")[0].trim(), dssInfo);
+
+      // 檢查是否有值得彈出提示或是超連結的欄位
+      fieldInfoList.value = getFieldInfoList(temp);
+    } else {
+      console.log("not support file extension", fileExtension);
+    }
   } catch (e) {
     console.log(e);
   }
 
   return false;
 }
-/** 被解析的RPG檔案 */
-const parsedRpgFile = ref<ParsedLine[]>([]);
+
 /** 欄位資訊 */
 const fieldInfoList = ref<FieldInfo[]>([]);
-/**
- * 上傳RPG檔案事件
- * @param file
- */
-async function handleUpload(file: File): Promise<boolean> {
-  try {
-    let res = await getContentByFile(file);
-    // 依照不同From type解析每行
-    parsedRpgFile.value = parseRpgFile(res);
-    // 檢查是否有值得彈出提示或是超連結的欄位
-    fieldInfoList.value = getFieldInfoList(parsedRpgFile.value);
-  } catch (e) {
-    console.log(e);
-  }
 
-  return false;
-}
 let isShowDrawer = ref<boolean>(false);
 
 /** 是否顯示Read Me */
@@ -107,10 +127,6 @@ function scrollToRef(position: number, _prevPosition: number) {
   }
 }
 
-
-/** 是否顯示十字線 */
-let openAuxiliaryCross = ref<boolean>(false);
-let auxiliaryCrossHandler = getAuxiliaryCrossHandler(openAuxiliaryCross);
 /**
  *
  */
@@ -121,106 +137,134 @@ onMounted(() => {
         // 左
         scrollToRef(prevPosition, 0); //TODO
       }
-      // e.altKey
-      if (e.key == "s") {
-        openAuxiliaryCross.value = !openAuxiliaryCross.value;
-      }
-      if (e.keyCode == 76) {
-        // l
-        // this.$refs["jumpLine"].focus();
-      }
-      // if (e.keyCode == 73) {
-      //   // i
-      //   console.log(this.parsedRpgFile);
-      //   console.log(this.fieldInfo);
-      // }
     }
   });
-
-  window.addEventListener("mousemove", auxiliaryCrossHandler);
 });
 
-onUnmounted(() => {
-  window.removeEventListener("mousemove", auxiliaryCrossHandler);
-});
-
-/**
- * DDS
- */
-let isShowDdsInfo = ref<boolean>(false);
-let targetDssInfo = ref<DssInfo>();
-function showDdsInfo(key: string) {
-  console.log("showDdsInfo", key, dssInfoMap.value);
-  isShowDdsInfo.value = true;
-  targetDssInfo.value = dssInfoMap.value.get(key.trim());
+function openTab(key: string) {
+  console.log("openTab", { key, t: tabList.value });
+  let temp = fileInfoMap.value.get(key.trim());
+  if (temp) {
+    if (!tabList.value.some((e) => e.name === key)) {
+      tabList.value.push(temp);
+    }
+    changeTab(key);
+  }
 }
 
+function changeTab(key: string) {
+  console.log("changeTab", key, targetTabName.value);
+  if (fileInfoMap.value.get(key.trim())) {
+    targetTabName.value = key.trim();
+  }
+}
 
+/**
+ * tab 拖拉事件
+ */
+function handleDragDrop(
+  name: string,
+  newName: string,
+  a: number,
+  b: number,
+  names: string
+) {
+  // names 为调整后的 name 集合
+  tabList.value.splice(b, 1, ...tabList.value.splice(a, 1, tabList.value[b]));
+}
+
+function handleTabRemove(name: string) {
+  console.log(name);
+  tabList.value = tabList.value.filter((e) => e.name != name);
+}
 </script>
 
 <template>
-  <Drawer title="DDS" placement="right" :mask="false" v-model="isShowDrawer">
-    <DssDrawer :dssInfoMap="dssInfoMap" />
+  <Drawer title="files" placement="right" :mask="false" v-model="isShowDrawer">
+    <DssDrawer :dssInfoMap="fileInfoMap" @openTab="openTab" />
   </Drawer>
   <Row :gutter="16">
-    <!-- <Col span="10">
-                                      <input type="file" ref="file" @change="readFile($event)" />
-                                           </Col> -->
     <Upload multiple :before-upload="handleUploadDDS">
-      <Button icon="ios-cloud-upload-outline">upload DDS file</Button>
+      <Button icon="ios-cloud-upload-outline">upload files</Button>
     </Upload>
-    <Button @click="isShowDrawer = true" type="primary">right</Button>
-    <Button @click="isShowDdsInfo = !isShowDdsInfo" type="primary">{{ isShowDdsInfo }}</Button>
-    <Upload :before-upload="handleUpload">
-      <Button icon="ios-cloud-upload-outline">upload RPG file</Button>
-    </Upload>
+    <Button @click="isShowDrawer = !isShowDrawer" type="primary">files</Button>
+
     <!-- <Col span="4">
-                                         跳至
-                                         <i-Input
-                                           ref="jumpLine"
-                                           v-model="lineValue"
-                                           placeholder="alt + l"
-                                           style="width: 100px"
-                                           @keypress="jumpToLine"
-                                         >
-                                         </i-Input>
-                                         行
-                                       </Col> -->
+        跳至
+        <i-Input
+          ref="jumpLine"
+          v-model="lineValue"
+          placeholder="alt + l"
+          style="width: 100px"
+          @keypress="jumpToLine"
+        >
+        </i-Input>
+        行
+    </Col> -->
     <Col span="5">
-    十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
+      十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
     </Col>
     <Col span="3">
-    <Button type="primary" @click="isShowReadMe = true">Read Me</Button>
+      <Button type="primary" @click="isShowReadMe = true"
+        >Read Me{{ isShowReadMe }}</Button
+      >
     </Col>
   </Row>
+  <Tabs
+    v-model="targetTabName"
+    type="card"
+    closable
+    :draggable="true"
+    @on-drag-drop="handleDragDrop"
+    @on-tab-remove="handleTabRemove"
+  >
+    <TabPane
+      v-for="(fileInfo, index) in tabList"
+      :key="index"
+      :label="fileInfo.fileName"
+      :name="fileInfo.name"
+    >
+    </TabPane>
+  </Tabs>
   <Row :gutter="0">
     <Col span="18">
-    {{
-      "_____________________1_________2_________3_________4_________5_________6_________7_________8"
-    }}</Col>
+      {{
+        "_____________________1_________2_________3_________4_________5_________6_________7_________8"
+      }}</Col
+    >
     <Col span="18">
-    {{
-      "____________12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-    }}</Col>
+      {{
+        "____________12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+      }}</Col
+    >
     <Col span="18"> {{ "_______INDEX" }}{{ selectedBar }} </Col>
     <Col span="6">
-    <Select v-model="selectedBarModel" style="width: 250px" size="small">
-      <i-Option v-for="item in FORM_TYPE_BAR_LIST" :value="item.value" :key="item.value">
-        <span>{{ item.label }}</span>
-        <span style="float: right; color: #ccc">{{ item.value }}</span>
-      </i-Option>
-    </Select>
+      <Select v-model="selectedBarModel" style="width: 250px" size="small">
+        <i-Option
+          v-for="item in FORM_TYPE_BAR_LIST"
+          :value="item.value"
+          :key="item.value"
+        >
+          <span>{{ item.label }}</span>
+          <span style="float: right; color: #ccc">{{ item.value }}</span>
+        </i-Option>
+      </Select>
     </Col>
   </Row>
 
   <div class="text-block0">
     <div class="container">
       <div class="cont_elements">
-        <div v-for="(rl, index) in parsedRpgFile" :class="getElementClass(index)" :ref="
-          (el) => {
-            divs[index] = el;
-          }
-        " @click="onElementClicked(rl, index)">
+        <div
+          v-for="(rl, index) in parsedRpgFile"
+          :class="getElementClass(index)"
+          :ref="
+            (el) => {
+              divs[index] = el;
+            }
+          "
+          @click="onElementClicked(rl, index)"
+        >
           <!-- {{ rl.rawRl }} -->
           <Poptip :title="'title'" width="500">
             <template #content> {{ rl }}</template>
@@ -229,19 +273,26 @@ function showDdsInfo(key: string) {
           </Poptip>
           <!-- 整行註解 -->
           <span v-if="rl.formType === 'comments'" class="comments">
-            {{ rl.rawRl }}</span>
+            {{ rl.rawRl }}</span
+          >
           <span v-else>
-            <FormTypeAll :rl="rl" :fieldInfoList="fieldInfoList" @open-dds="showDdsInfo" />
+            <FormTypeAll
+              :rl="rl"
+              :fieldInfoList="fieldInfoList"
+              @open-dds="changeTab"
+            />
             <span v-if="rl.formType === 'unknown'" class="non">
-              {{ rl.rawRl }}</span>
+              {{ rl.rawRl }}</span
+            >
             <span v-if="rl.formType === 'unknown2'" class="non2">
-              {{ rl.rawRl }}</span>
+              {{ rl.rawRl }}</span
+            >
           </span>
         </div>
       </div>
     </div>
   </div>
-  <Modal v-model="isShowReadMe" title="RPG小助手 1.1.0">
+  <!-- <Modal v-model="isShowReadMe" title="RPG小助手 1.1.0">
     <Row :gutter="16">
       <Col span="24"> 目前主要支援F E I C 規格 </Col>
     </Row>
@@ -261,40 +312,9 @@ function showDdsInfo(key: string) {
       <Col span="8">alt + 鍵盤左:</Col>
       <Col span="14"> 回到跳轉之前的位置 </Col>
     </Row>
-  </Modal>
-  <Modal v-model="isShowDdsInfo" footer-hide draggable sticky scrollable width="500" :mask="false"
-    :title="targetDssInfo?.name">
-    <div class="text-block1">
-      <div class="container">
-        <div class="cont_elements">
-          <div v-for="(rl, index) in targetDssInfo?.parsedLineList" :class="getElementClass(index)" :ref="
-            (el) => {
-              divs[index] = el;
-            }
-          ">
-            <!--  @click="onElementClicked(rl, index)" -->
-            <!-- {{ rl.rawRl }} -->
-            <Poptip :title="'title'" width="500">
-              <template #content> {{ rl }}</template>
+  </Modal> -->
 
-              {{ " " + (index + 1).toString().padStart(5, "0") }}
-            </Poptip>
-            <!-- 整行註解 -->
-            <span v-if="rl.formType === 'comments'" class="comments">
-              {{ rl.rawRl }}</span>
-            <span v-else>
-              <FormTypeAll :rl="rl" :fieldInfoList="fieldInfoList">
-              </FormTypeAll>
-              <span v-if="rl.formType === 'unknown'" class="non">
-                {{ rl.rawRl }}</span>
-              <span v-if="rl.formType === 'unknown2'" class="non2">
-                {{ rl.rawRl }}</span>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </Modal>
+  <ReadMe v-model:isShowReadMe="isShowReadMe" />
 </template>
 
 <style scoped>
