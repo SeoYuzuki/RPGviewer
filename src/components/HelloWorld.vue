@@ -1,20 +1,24 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { Button } from "view-ui-plus";
 
 import { getContentByFile } from "../utils/A1Utils";
 import AuxiliaryCross from "../utils/AuxiliaryCross";
-import { parseRpgFile } from "../core/fileParse/RpgFileParser";
-import { parseDdsFile } from "../core/fileParse/DDSFileParser";
-import { getFieldInfoList } from "../core/FieldInfoParser";
+import { parseFile } from "../core/fileParse/fileParser";
+import {
+  privateFieldInfoMap,
+  publicFieldInfoMap,
+} from "../core/FieldInfoParser";
 import { FileInfo, ParsedLine } from "../types/parsedRpgFile";
 import { FORM_TYPE_BAR_LIST } from "../dictionary/RPG_dictionary";
 import { FieldInfo } from "../types/FieldInfo";
 /** components */
-import FormTypeAll from "./formType/FormTypeAll.vue";
+import FileLine from "./formType/FileLine.vue";
 import DssDrawer from "./DssDrawer.vue";
 import ReadMe from "./ReadMe.vue";
+import JumpLine from "./JumpLine.vue";
 
+/** 十字線事件 */
 let openAuxiliaryCross = AuxiliaryCross().openAuxiliaryCross;
 
 /**
@@ -22,55 +26,66 @@ let openAuxiliaryCross = AuxiliaryCross().openAuxiliaryCross;
  */
 
 /** 上傳的檔案列表 */
-let fileInfoMap = ref<Map<string, FileInfo>>(new Map());
+const fileInfoMap = ref<Map<string, FileInfo>>(new Map());
 /** 當前Tab名稱 */
-let targetTabName = ref<string>("");
+const targetTabName = ref<string>("");
 /** tab顯示清單 */
-let tabList = ref<FileInfo[]>([]);
+const tabList = ref<FileInfo[]>([]);
 /** 當前渲染程式碼 */
-const parsedRpgFile = computed(() => {
-  return fileInfoMap.value.get(targetTabName.value)?.parsedLineList;
+const parsedRpgFile = ref<ParsedLine[]>();
+/** 該文件之欄位資訊 */
+const targetFieldInfoList = ref<FieldInfo[]>([]);
+/**
+ * 當tab文件切換時
+ */
+watch(targetTabName, (val, oldVa) => {
+  parsedRpgFile.value = fileInfoMap.value.get(val)?.parsedLineList;
+  let temp = privateFieldInfoMap.value.get(val);
+  console.log("fieldInfoList", temp);
+  if (temp) {
+    console.log("fieldInfoList", temp);
+    targetFieldInfoList.value = temp;
+  }
+});
+
+/** 欄位資訊清單 共用+各自檔案 */
+const fieldInfoList = computed(() => {
+  let temp: FieldInfo[] = [];
+  console.log(publicFieldInfoMap.value);
+  publicFieldInfoMap.value.forEach((e) => {
+    console.log(e);
+    temp = temp.concat(e);
+  });
+  return targetFieldInfoList.value.concat(temp);
 });
 
 /**
- * 上傳DDS檔案事件
+ * 上傳檔案事件
  */
-async function handleUploadDDS(file: File): Promise<boolean> {
+async function handleUpload(file: File): Promise<boolean> {
   try {
-    let fileExtension = /[.]/.exec(file.name) ? file.name.split(".")[1] : "";
+    let fileExtension = (/[.]/.exec(file.name) ? file.name.split(".")[1] : "")
+      .trim()
+      .toLowerCase();
     let name = file.name.split(".")[0].trim();
     console.log(file, fileExtension);
     let dssInfo: FileInfo;
     let res = await getContentByFile(file);
-    if (["dds", "pf"].includes(fileExtension.toLowerCase())) {
-      let temp = parseDdsFile(res);
-      dssInfo = {
-        parsedLineList: temp,
-        fileName: file.name,
-        name: name,
-        fileExtension: fileExtension,
-      };
-      tabList.value = tabList.value.filter((e) => e.name !== name);
-      tabList.value.push(dssInfo);
-      fileInfoMap.value.set(file.name.split(".")[0].trim(), dssInfo);
-    } else if (["rpg"].includes(fileExtension.toLowerCase())) {
-      // 依照不同From type解析每行
-      let temp = parseRpgFile(res);
-      dssInfo = {
-        parsedLineList: temp,
-        fileName: file.name,
-        name: file.name.split(".")[0],
-        fileExtension: fileExtension,
-      };
-      tabList.value = tabList.value.filter((e) => e.name !== name);
-      tabList.value.push(dssInfo);
-      fileInfoMap.value.set(file.name.split(".")[0].trim(), dssInfo);
 
-      // 檢查是否有值得彈出提示或是超連結的欄位
-      fieldInfoList.value = getFieldInfoList(temp);
-    } else {
-      console.log("not support file extension", fileExtension);
-    }
+    dssInfo = {
+      parsedLineList: parseFile(res, name, fileExtension),
+      fileName: file.name,
+      name: name,
+      fileExtension: fileExtension,
+    };
+    tabList.value = tabList.value.filter((e) => e.name !== name);
+    tabList.value.push(dssInfo);
+    fileInfoMap.value.set(file.name.split(".")[0].trim(), dssInfo);
+
+    fileInfoMap.value.set(file.name.split(".")[0].trim(), dssInfo);
+
+    // fieldInfoList.value = getFieldInfoList(temp);
+    targetTabName.value = name;
   } catch (e) {
     console.log(e);
   }
@@ -78,13 +93,12 @@ async function handleUploadDDS(file: File): Promise<boolean> {
   return false;
 }
 
-/** 欄位資訊 */
-const fieldInfoList = ref<FieldInfo[]>([]);
-
+/** 是否顯示檔案抽屜 */
 let isShowDrawer = ref<boolean>(false);
-
 /** 是否顯示Read Me */
 let isShowReadMe = ref<boolean>(false);
+/** 是否顯示跳行 */
+let isShowJumpLine = ref<boolean>(false);
 
 let lineClicked = ref<number>(0);
 let selectedBarModel = ref<string>();
@@ -96,7 +110,7 @@ function getElementClass(index: number) {
 }
 
 function onElementClicked(rl: ParsedLine, index: number) {
-  console.log(rl.formTypeSpecifications, index, rl, fieldInfoList.value);
+  console.log(rl.formTypeSpecifications, index, rl);
   lineClicked.value = index;
   if (rl.formTypeSpecifications) {
     selectedBarModel.value = rl.formTypeSpecifications;
@@ -115,10 +129,11 @@ const selectedBar = computed(() => {
 
 const divs = ref<any[]>([]);
 let prevPosition: number = 0;
-function scrollToRef(position: number, _prevPosition: number) {
-  console.log("scrollWin", position.toString().padStart(5, "0"));
-  console.log(divs.value);
-
+function scrollToRef(position: number, _prevPosition?: number) {
+  if (!_prevPosition) {
+    _prevPosition = position;
+  }
+  console.log("scrollWin", position, _prevPosition);
   let el: Element = divs.value[position];
 
   if (el) {
@@ -133,28 +148,29 @@ function scrollToRef(position: number, _prevPosition: number) {
 onMounted(() => {
   window.addEventListener("keydown", (e) => {
     if (e.altKey) {
-      if (e.keyCode == 37) {
+      if (e.key == "ArrowLeft") {
         // 左
         scrollToRef(prevPosition, 0); //TODO
+      }
+      if (e.key === "l") {
+        isShowJumpLine.value = !isShowJumpLine.value;
+      }
+      if (e.key === "i") {
+        console.log(fieldInfoList.value, publicFieldInfoMap.value);
       }
     }
   });
 });
 
 function openTab(key: string) {
+  key = key.trim();
   console.log("openTab", { key, t: tabList.value });
-  let temp = fileInfoMap.value.get(key.trim());
+  let temp = fileInfoMap.value.get(key);
   if (temp) {
+    // 如果上方tab不存在則添加
     if (!tabList.value.some((e) => e.name === key)) {
       tabList.value.push(temp);
     }
-    changeTab(key);
-  }
-}
-
-function changeTab(key: string) {
-  console.log("changeTab", key, targetTabName.value);
-  if (fileInfoMap.value.get(key.trim())) {
     targetTabName.value = key.trim();
   }
 }
@@ -184,7 +200,7 @@ function handleTabRemove(name: string) {
     <DssDrawer :dssInfoMap="fileInfoMap" @openTab="openTab" />
   </Drawer>
   <Row :gutter="16">
-    <Upload multiple :before-upload="handleUploadDDS">
+    <Upload multiple :before-upload="handleUpload">
       <Button icon="ios-cloud-upload-outline">upload files</Button>
     </Upload>
     <Button @click="isShowDrawer = !isShowDrawer" type="primary">files</Button>
@@ -229,15 +245,15 @@ function handleTabRemove(name: string) {
   <Row :gutter="0">
     <Col span="18">
       {{
-        "_____________________1_________2_________3_________4_________5_________6_________7_________8"
+        "________________1_________2_________3_________4_________5_________6_________7_________8"
       }}</Col
     >
     <Col span="18">
       {{
-        "____________12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+        "_______12345678901234567890123456789012345678901234567890123456789012345678901234567890"
       }}</Col
     >
-    <Col span="18"> {{ "_______INDEX" }}{{ selectedBar }} </Col>
+    <Col span="18"> {{ "__INDEX" }}{{ selectedBar }} </Col>
     <Col span="6">
       <Select v-model="selectedBarModel" style="width: 250px" size="small">
         <i-Option
@@ -256,65 +272,45 @@ function handleTabRemove(name: string) {
     <div class="container">
       <div class="cont_elements">
         <div
-          v-for="(rl, index) in parsedRpgFile"
+          v-for="(parsedLine, index) in parsedRpgFile"
           :class="getElementClass(index)"
           :ref="
             (el) => {
               divs[index] = el;
             }
           "
-          @click="onElementClicked(rl, index)"
+          @click="onElementClicked(parsedLine, index)"
         >
           <!-- {{ rl.rawRl }} -->
           <Poptip :title="'title'" width="500">
-            <template #content> {{ rl }}</template>
+            <template #content> {{ parsedLine }}</template>
 
             {{ " " + (index + 1).toString().padStart(5, "0") }}
           </Poptip>
           <!-- 整行註解 -->
-          <span v-if="rl.formType === 'comments'" class="comments">
-            {{ rl.rawRl }}</span
+          <span v-if="parsedLine.formType === 'comments'" class="comments">
+            {{ parsedLine.rawRl }}</span
           >
           <span v-else>
-            <FormTypeAll
-              :rl="rl"
+            <FileLine
+              :parsed-line="parsedLine"
               :fieldInfoList="fieldInfoList"
-              @open-dds="changeTab"
+              @open-dds="openTab"
+              @scroll-to-ref="scrollToRef"
             />
-            <span v-if="rl.formType === 'unknown'" class="non">
-              {{ rl.rawRl }}</span
+            <span v-if="parsedLine.formType === 'unknown'" class="non">
+              {{ parsedLine.rawRl }}</span
             >
-            <span v-if="rl.formType === 'unknown2'" class="non2">
-              {{ rl.rawRl }}</span
+            <span v-if="parsedLine.formType === 'unknown2'" class="non2">
+              {{ parsedLine.rawRl }}</span
             >
           </span>
         </div>
       </div>
     </div>
   </div>
-  <!-- <Modal v-model="isShowReadMe" title="RPG小助手 1.1.0">
-    <Row :gutter="16">
-      <Col span="24"> 目前主要支援F E I C 規格 </Col>
-    </Row>
-    <Row :gutter="16">
-      <Col span="8">左鍵有顏色之關鍵字:</Col>
-      <Col span="16"> 可以叫出說明 </Col>
-    </Row>
-    <Row :gutter="16">
-      <Col span="8">雙擊滑鼠左鍵:</Col>
-      <Col span="14"> 顯示該FormType規格 </Col>
-    </Row>
-    <Row :gutter="16">
-      <Col span="8">ctrl + 滑鼠左鍵:</Col>
-      <Col span="14"> 跳到在此檔案中定義field的位置 </Col>
-    </Row>
-    <Row :gutter="16">
-      <Col span="8">alt + 鍵盤左:</Col>
-      <Col span="14"> 回到跳轉之前的位置 </Col>
-    </Row>
-  </Modal> -->
-
   <ReadMe v-model:isShowReadMe="isShowReadMe" />
+  <JumpLine v-model:is-show="isShowJumpLine" @jump-to-line="scrollToRef" />
 </template>
 
 <style scoped>
@@ -322,7 +318,7 @@ function handleTabRemove(name: string) {
   position: absolute;
   background-color: rgb(0, 0, 0);
   color: rgb(255, 255, 255);
-  height: 95%;
+  height: 80%;
   width: 100%;
   /* position: absolute;
       width: 100%;

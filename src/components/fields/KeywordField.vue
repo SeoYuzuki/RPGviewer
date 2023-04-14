@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { Poptip } from "view-ui-plus";
 import {
   Keywords_Dic,
   KeywordsDic,
@@ -35,6 +36,7 @@ function openUrl() {
     class="poptip"
     width="300"
     word-wrap
+    transfer
   >
     <span :class="span_class">{{ keyword }}</span>
     <template #content>

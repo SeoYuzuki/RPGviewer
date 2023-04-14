@@ -5,16 +5,16 @@ import ParameterField from "../fields/ParameterField.vue";
 import KeywordField from "../fields/KeywordField.vue";
 import { FieldInfo } from "../../types/FieldInfo";
 
-const props = defineProps<{ rl: ParsedLine; fieldInfoList: FieldInfo[] }>();
+const props = defineProps<{ parsedLine: ParsedLine; fieldInfoList: FieldInfo[] }>();
 const emit = defineEmits<{
   (e: "scrollToRef", position: number, prevPosition: number): void;
   (e: "openDds", name: string): void;
 }>();
 
-let formContent = props.rl.formContent;
+let formContent = props.parsedLine.formContent;
 
 function scrollToRef(position: number, prevPosition: number) {
-  // emit("scrollToRef", position, prevPosition);
+  emit("scrollToRef", position, prevPosition);
 }
 
 function openDds(name: string) {
@@ -24,13 +24,21 @@ function openDds(name: string) {
 
 <template>
   <span>
-    <template v-for="[key, value] in rl.contentMap">
+    <template v-for="[key, value] in parsedLine.contentMap">
       <template v-if="value.view === 'KeywordField'">
-        <KeywordField :keyword="value.value" :dictionary="value.dic"></KeywordField>
+        <KeywordField
+          :keyword="value.value"
+          :dictionary="value.dic"
+        ></KeywordField>
       </template>
       <template v-else-if="value.view === 'ParameterField'">
-        <ParameterField :field-info-list="fieldInfoList" :field_text="value.value" :index="rl.index"
-          @scroll-to-ref="scrollToRef" @openDds="openDds"></ParameterField>
+        <ParameterField
+          :field-info-list="fieldInfoList"
+          :field-text="value.value"
+          :index="parsedLine.index"
+          @scroll-to-ref="scrollToRef"
+          @openDds="openDds"
+        ></ParameterField>
       </template>
       <span v-else :class="value.class">{{ value.value }}</span>
     </template>

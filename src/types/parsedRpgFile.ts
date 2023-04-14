@@ -2,17 +2,20 @@ import { KeywordsDic } from "../dictionary/RPG_dictionary";
 import { FormType } from "./FormType";
 
 /**
- * 
+ * 解析後的行
  */
 class ParsedLine {
     index: number;
     rawRl: string;
     formType: FormType;
-    contentMap?: Map<string, RPGContent>;
+    contentMap: Map<string, RPGContent>;
     formTypeSpecifications?: string;
     formContent?: any
 }
 
+/**
+ * 整檔資訊
+ */
 class FileInfo {
     parsedLineList: ParsedLine[]
     name: string

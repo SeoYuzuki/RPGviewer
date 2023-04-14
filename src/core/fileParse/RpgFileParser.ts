@@ -16,7 +16,7 @@ import { parseContinuationLines, parseFileDescriptionSpecification } from "../pa
 
 /** https://www.ibm.com/docs/en/rdfi/9.6.0?topic=rpg400-language-reference#ToC_286 */
 
-const parseRpgFile = function (_rpgFile: string) {
+const parseRpgFile = function (_rpgFile: string): ParsedLine[] {
     let rpgFile = _rpgFile.split('\r\n');
     let parsedRpgFile: ParsedLine[] = [];
     for (let i = 0; i < rpgFile.length; i++) {
@@ -47,6 +47,7 @@ const parseRpgFile = function (_rpgFile: string) {
                         index: i,
                         rawRl: rl,
                         formType: "unknown2",
+                        contentMap: new Map()
                     });
                 }
             } else if (rl[5] === 'E') {
@@ -87,6 +88,7 @@ const parseRpgFile = function (_rpgFile: string) {
                                 index: i + j,
                                 rawRl: tempRl,
                                 formType: "comments",
+                                contentMap: new Map()
                             });
                             continue;
                         } else if (substr_by_bytes(tempRl, 18, 2) === 'DS'
@@ -127,6 +129,7 @@ const parseRpgFile = function (_rpgFile: string) {
                                 index: i + j,
                                 rawRl: tempRl,
                                 formType: "comments",
+                                contentMap: new Map()
                             });
                             continue;
                         } else if (
@@ -169,6 +172,7 @@ const parseRpgFile = function (_rpgFile: string) {
                                 index: i + j,
                                 rawRl: tempRl,
                                 formType: "comments",
+                                contentMap: new Map()
                             });
                             continue;
                         }
@@ -227,6 +231,7 @@ const parseRpgFile = function (_rpgFile: string) {
                         index: i,
                         rawRl: rl,
                         formType: "unknown",
+                        contentMap: new Map()
                     });
                 }
             } else {
@@ -234,6 +239,7 @@ const parseRpgFile = function (_rpgFile: string) {
                     index: i,
                     rawRl: rl,
                     formType: "unknown",
+                    contentMap: new Map()
                 });
             }
         } else {
@@ -242,6 +248,7 @@ const parseRpgFile = function (_rpgFile: string) {
                 index: i,
                 rawRl: rl,
                 formType: "comments",
+                contentMap: new Map()
             });
         }
     }

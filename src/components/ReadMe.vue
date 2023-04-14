@@ -36,6 +36,14 @@ function onVisibleChange(event: boolean) {
       <Col span="8">alt + 鍵盤左:</Col>
       <Col span="14"> 回到跳轉之前的位置 </Col>
     </Row>
+    <Row :gutter="16">
+      <Col span="8">alt + l:</Col>
+      <Col span="14"> 跳至行數 </Col>
+    </Row>
+    <Row :gutter="16">
+      <Col span="8">alt +i:</Col>
+      <Col span="14"> 除錯用 log fieldInfoList </Col>
+    </Row>
   </Modal>
 </template>
 

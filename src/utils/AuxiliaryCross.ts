@@ -1,6 +1,9 @@
 import { ref, Ref } from "@vue/reactivity";
 import { onMounted, onUnmounted } from "vue";
 
+/**
+ * 十字線事件，包含監聽鍵盤事件
+ */
 export default function () {
     console.log("auxiliaryCross");
     // 十字線
@@ -68,5 +71,8 @@ export default function () {
         window.removeEventListener("mousemove", auxiliaryCrossHandler);
     });
 
-    return { openAuxiliaryCross };
+    return {
+        /** 是否開啟十字線 */
+        openAuxiliaryCross
+    };
 }
