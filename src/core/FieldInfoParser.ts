@@ -1,6 +1,6 @@
 import { isNotBlank, isBlank } from "../utils/StringUtils"
 import { ParsedLine, RPGContent } from "../types/parsedRpgFile"
-import { FieldInfo } from "../types/FieldInfo";
+import { FieldInfo, Position } from "../types/FieldInfo";
 import { ref } from "@vue/reactivity";
 
 
@@ -8,8 +8,13 @@ const publicFieldInfoMap = ref<Map<string, FieldInfo[]>>(new Map());
 const privateFieldInfoMap = ref<Map<string, FieldInfo[]>>(new Map())
 
 
-
-const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, type: string) {
+/**
+ * 
+ * @param parsedRpgFile 解析後的行列
+ * @param fileName 檔名
+ * @param type 
+ */
+const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: string, type: string) {
     let noCommentsRpg = parsedRpgFile.filter(e => { return e.formType !== 'comments' });
     let fieldInfoList: FieldInfo[] = [];
     for (let count = 0; count < noCommentsRpg.length; count++) {
@@ -20,7 +25,10 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, t
             // 變數初始化位置
             if (map.get("Field_Length")?.value?.trim()) {
                 fieldInfoList.push({
-                    position: rl.index,
+                    position: {
+                        fileName: fileName,
+                        index: rl.index
+                    },
                     fieldName: map.get("Result_Field")?.value,
                     info: {
                         content: "A field with a length of " +
@@ -33,7 +41,10 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, t
             // BEGSR: 表示function名稱
             if (map.get("Opcde")?.value === 'BEGSR') {
                 fieldInfoList.push({
-                    position: rl.index,
+                    position: {
+                        fileName: fileName,
+                        index: rl.index
+                    },
                     fieldName: map.get("Factor1")?.value,
                     info: {
                         content: "Subroutine.",
@@ -55,7 +66,10 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, t
                 }
 
                 fieldInfoList.push({
-                    position: rl.index,
+                    position: {
+                        fileName: fileName,
+                        index: rl.index
+                    },
                     fieldName: map.get("Factor1")?.value,
                     info: {
                         content: "KLIST with KFLD: " + kfld,
@@ -69,7 +83,10 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, t
             let map: Map<String, RPGContent> = rl.contentMap;
             if (rl.formTypeSpecifications === "Record_Identification") {
                 fieldInfoList.push({
-                    position: rl.index,
+                    position: {
+                        fileName: fileName,
+                        index: rl.index
+                    },
                     fieldName: map.get("File Name")?.value,
                     info: {
                         content: "File",
@@ -79,7 +96,10 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, t
                 });
             } else if (rl.formTypeSpecifications === "Field_Description") {
                 fieldInfoList.push({
-                    position: rl.index,
+                    position: {
+                        fileName: fileName,
+                        index: rl.index
+                    },
                     fieldName: map.get("Field Name")?.value,
                     info: {
                         content: "field of File",
@@ -88,7 +108,10 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, t
                 });
             } else if (rl.formTypeSpecifications === "Record_Identification_External") {
                 fieldInfoList.push({
-                    position: rl.index,
+                    position: {
+                        fileName: fileName,
+                        index: rl.index
+                    },
                     fieldName: map.get("Record Name")?.value,
                     info: {
                         content: "Record",
@@ -98,7 +121,10 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, t
                 });
             } else if (rl.formTypeSpecifications === "Field_Description_External") {
                 fieldInfoList.push({
-                    position: rl.index,
+                    position: {
+                        fileName: fileName,
+                        index: rl.index
+                    },
                     fieldName: map.get("Field Name")?.value,
                     info: {
                         content: "Field of record.",
@@ -107,7 +133,10 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, t
                 });
             } else if (rl.formTypeSpecifications === "Data_Structure") {
                 fieldInfoList.push({
-                    position: rl.index,
+                    position: {
+                        fileName: fileName,
+                        index: rl.index
+                    },
                     fieldName: map.get("Data Structure Name")?.value,
                     info: {
                         content: "Data Structure.",
@@ -117,7 +146,10 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, t
                 });
             } else if (rl.formTypeSpecifications === "Data_Structure_Subfield") {
                 fieldInfoList.push({
-                    position: rl.index,
+                    position: {
+                        fileName: fileName,
+                        index: rl.index
+                    },
                     fieldName: map.get("Field Name")?.value,
                     info: {
                         content: "Field Name",
@@ -126,7 +158,10 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, t
                 });
             } else if (rl.formTypeSpecifications === "Named_Constant") {
                 fieldInfoList.push({
-                    position: rl.index,
+                    position: {
+                        fileName: fileName,
+                        index: rl.index
+                    },
                     fieldName: map.get("Constant Name")?.value,
                     info: {
                         content: "Constant Name",
@@ -138,7 +173,10 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, t
             let map: Map<String, RPGContent> = rl.contentMap;
             if (map.get("Array_or_Table_Name1")) {
                 fieldInfoList.push({
-                    position: rl.index,
+                    position: {
+                        fileName: fileName,
+                        index: rl.index
+                    },
                     fieldName: map.get("Array_or_Table_Name1")?.value,
                     info: {
                         content: (
@@ -162,7 +200,10 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, t
             let map: Map<String, RPGContent> = rl.contentMap;
             if (map.get("File Name")) {
                 fieldInfoList.push({
-                    position: rl.index,
+                    position: {
+                        fileName: fileName,
+                        index: rl.index
+                    },
                     fieldName: map.get("File Name")?.value,
                     info: {
                         content: "File Name",
@@ -176,9 +217,9 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], name: string, t
     }
 
     if (type === "private") {
-        privateFieldInfoMap.value.set(name, fieldInfoList);
+        privateFieldInfoMap.value.set(fileName, fieldInfoList);
     } else if (type === "public") {
-        publicFieldInfoMap.value.set(name, fieldInfoList);
+        publicFieldInfoMap.value.set(fileName, fieldInfoList);
     }
 
 }
@@ -188,18 +229,32 @@ const saveFieldInfoList_A = function (parsedRpgFile: ParsedLine[], name: string,
     let fieldInfoList: FieldInfo[] = [];
     for (let count = 0; count < noCommentsRpg.length; count++) {
         let rl: ParsedLine = noCommentsRpg[count];
-        // C卡
+        // A卡
         if (rl.formType === 'A') {
             let map: Map<String, RPGContent> = rl.contentMap;
+            let position: Position = {
+                fileName: name,
+                index: rl.index
+            };
             console.log({ v: map.get("Type of Name")?.value })
             if (map.get("Type of Name")?.value === 'R') {
                 console.log('123')
                 fieldInfoList.push({
-                    position: rl.index,
+                    position: position,
                     fieldName: map.get("Name")?.value,
                     info: {
                         content: "Record",
                         class: "record",
+                        title: "",
+                    }
+                });
+            } else if (map.get("Type of Name")?.value === ' ') {
+                // TODO 排除 連續LINE
+                fieldInfoList.push({
+                    position: position,
+                    fieldName: map.get("Name")?.value,
+                    info: {
+                        content: "Field, length of " + map.get("Length")?.value + ',' + map.get("Decimal positions")?.value,
                         title: "",
                     }
                 });
@@ -215,178 +270,4 @@ const saveFieldInfoList_A = function (parsedRpgFile: ParsedLine[], name: string,
     }
 }
 
-const getFieldInfoList = function (parsedRpgFile: ParsedLine[]): FieldInfo[] {
-    let noCommentsRpg = parsedRpgFile.filter(e => { return e.formType !== 'comments' });
-    let fieldInfoList: FieldInfo[] = [];
-    for (let count = 0; count < noCommentsRpg.length; count++) {
-        let rl: ParsedLine = noCommentsRpg[count];
-        // C卡
-        if (rl.formType === 'C') {
-            if (rl.contentMap) {
-                let map: Map<String, RPGContent> = rl.contentMap;
-                // 變數初始化位置
-                if (map.get("Field_Length")?.value?.trim()) {
-                    fieldInfoList.push({
-                        position: rl.index,
-                        fieldName: map.get("Result_Field")?.value,
-                        info: {
-                            content: "A field with a length of " +
-                                map.get("Field_Length")?.value + ',' +
-                                map.get("Decimal_Positions")?.value,
-                            title: ""
-                        },
-                    });
-                }
-                // BEGSR: 表示function名稱
-                if (map.get("Opcde")?.value === 'BEGSR') {
-                    fieldInfoList.push({
-                        position: rl.index,
-                        fieldName: map.get("Factor1")?.value,
-                        info: {
-                            content: "Subroutine.",
-                            title: ""
-                        },
-                    });
-                }
-
-                /** KLIST */
-                if (map.get("Opcde")?.value === 'KLIST') {
-                    let kfld = [];
-                    for (let k = 1; ; k++) {
-                        let temp_rl = noCommentsRpg[count + k];
-                        if (temp_rl.contentMap?.get("Opcde")?.value === 'KFLD ') {
-                            kfld.push(temp_rl.contentMap.get("Result_Field")?.value);
-                        } else {
-                            break;
-                        }
-                    }
-
-                    fieldInfoList.push({
-                        position: rl.index,
-                        fieldName: map.get("Factor1")?.value,
-                        info: {
-                            content: "KLIST with KFLD: " + kfld,
-                            title: ""
-                        },
-                    });
-                }
-            }
-        } else if (rl.formType === 'I') {
-            if (rl.contentMap) {
-                let map: Map<String, RPGContent> = rl.contentMap;
-                if (rl.formTypeSpecifications === "Record_Identification") {
-                    fieldInfoList.push({
-                        position: rl.index,
-                        fieldName: map.get("File Name")?.value,
-                        info: {
-                            content: "File",
-                            title: "",
-                            class: "file"
-                        }
-                    });
-                } else if (rl.formTypeSpecifications === "Field_Description") {
-                    fieldInfoList.push({
-                        position: rl.index,
-                        fieldName: map.get("Field Name")?.value,
-                        info: {
-                            content: "field of File",
-                            title: "",
-                        }
-                    });
-                } else if (rl.formTypeSpecifications === "Record_Identification_External") {
-                    fieldInfoList.push({
-                        position: rl.index,
-                        fieldName: map.get("Record Name")?.value,
-                        info: {
-                            content: "Record",
-                            class: "record",
-                            title: "",
-                        }
-                    });
-                } else if (rl.formTypeSpecifications === "Field_Description_External") {
-                    fieldInfoList.push({
-                        position: rl.index,
-                        fieldName: map.get("Field Name")?.value,
-                        info: {
-                            content: "Field of record.",
-                            title: "",
-                        }
-                    });
-                } else if (rl.formTypeSpecifications === "Data_Structure") {
-                    fieldInfoList.push({
-                        position: rl.index,
-                        fieldName: map.get("Data Structure Name")?.value,
-                        info: {
-                            content: "Data Structure.",
-                            class: "data-structure",
-                            title: "",
-                        }
-                    });
-                } else if (rl.formTypeSpecifications === "Data_Structure_Subfield") {
-                    fieldInfoList.push({
-                        position: rl.index,
-                        fieldName: map.get("Field Name")?.value,
-                        info: {
-                            content: "Field Name",
-                            title: "",
-                        }
-                    });
-                } else if (rl.formTypeSpecifications === "Named_Constant") {
-                    fieldInfoList.push({
-                        position: rl.index,
-                        fieldName: map.get("Constant Name")?.value,
-                        info: {
-                            content: "Constant Name",
-                            title: "",
-                        }
-                    });
-                }
-            }
-        } else if (rl.formType === 'E') {
-            if (rl.contentMap) {
-                let map: Map<String, RPGContent> = rl.contentMap;
-                if (map.get("Array_or_Table_Name1")) {
-                    fieldInfoList.push({
-                        position: rl.index,
-                        fieldName: map.get("Array_or_Table_Name1")?.value,
-                        info: {
-                            content: (
-                                "It's a Array or Table.\r\n" +
-                                "Entries per Record:" +
-                                map.get("Entries_per_Record")?.value +
-                                "\r\n" +
-                                "Entries per Array or Table:" +
-                                map.get("Entries_per_Array_or_Table")?.value +
-                                "\r\n" +
-                                "Length of Entry:" +
-                                map.get("Length_of_Entry1")?.value +
-                                "\r\n"
-                            ),
-                            title: ""
-                        }
-                    });
-                }
-            }
-        } else if (rl.formType === 'F') {
-            console.log(rl);
-            if (rl.contentMap) {
-                let map: Map<String, RPGContent> = rl.contentMap;
-                if (map.get("File Name")) {
-                    fieldInfoList.push({
-                        position: rl.index,
-                        fieldName: map.get("File Name")?.value,
-                        info: {
-                            content: "File Name",
-                            title: "",
-                            openDss: map.get("File Name")?.value
-                        }
-                    });
-                }
-            }
-        }
-    }
-
-    return fieldInfoList;
-}
-
-export { getFieldInfoList, saveFieldInfoList, saveFieldInfoList_A, publicFieldInfoMap, privateFieldInfoMap }
+export { saveFieldInfoList, saveFieldInfoList_A, publicFieldInfoMap, privateFieldInfoMap }

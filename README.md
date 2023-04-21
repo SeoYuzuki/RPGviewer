@@ -1,6 +1,17 @@
 Test cases are from https://github.com/barrettotte/vscode-ibmi-languages/
 thx
 
+DOING
+1. 加強A卡分析
+
+BUG
+1. A卡判斷連續行
+2. 左右鍵導向
+
+TODO 
+1. formType O
+
+
 # Vue 3 + TypeScript + Vite
 
 This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.

@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { Constants } from "../../dictionary/RPG_dictionary";
-import { FieldInfo } from "../../types/FieldInfo";
+import { FieldInfo, Position } from "../../types/FieldInfo";
 const props = defineProps<{
   fieldInfoList: FieldInfo[];
   fieldText: string;
   index: number;
 }>();
 const emit = defineEmits<{
-  (e: "scrollToRef", position: number, prevPosition: number): void;
+  (e: "scrollToRef", position: Position, preIndex: number): void;
   (e: "openDds", name: string): void;
 }>();
 
@@ -61,7 +61,10 @@ function onClick(e: MouseEvent) {
       emit("openDds", targetFieldInfo.value?.info.openDss);
       return;
     }
-    emit("scrollToRef", targetFieldInfo.value?.position ?? 0, props.index);
+
+    if (targetFieldInfo.value?.position) {
+      emit("scrollToRef", targetFieldInfo.value?.position, props.index);
+    }
   }
 }
 function handleMouseEvent(e: any) {

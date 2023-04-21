@@ -3,18 +3,21 @@ import { ref, computed } from "vue";
 import { ParsedLine } from "../../types/parsedRpgFile";
 import ParameterField from "../fields/ParameterField.vue";
 import KeywordField from "../fields/KeywordField.vue";
-import { FieldInfo } from "../../types/FieldInfo";
+import { FieldInfo, Position } from "../../types/FieldInfo";
 
-const props = defineProps<{ parsedLine: ParsedLine; fieldInfoList: FieldInfo[] }>();
+const props = defineProps<{
+  parsedLine: ParsedLine;
+  fieldInfoList: FieldInfo[];
+}>();
 const emit = defineEmits<{
-  (e: "scrollToRef", position: number, prevPosition: number): void;
+  (e: "scrollToRef", position: Position, preIndex: number): void;
   (e: "openDds", name: string): void;
 }>();
 
 let formContent = props.parsedLine.formContent;
 
-function scrollToRef(position: number, prevPosition: number) {
-  emit("scrollToRef", position, prevPosition);
+function scrollToRef(position: Position, preIndex: number) {
+  emit("scrollToRef", position, preIndex);
 }
 
 function openDds(name: string) {

@@ -11,7 +11,7 @@ import {
 } from "../core/FieldInfoParser";
 import { FileInfo, ParsedLine } from "../types/parsedRpgFile";
 import { FORM_TYPE_BAR_LIST } from "../dictionary/RPG_dictionary";
-import { FieldInfo } from "../types/FieldInfo";
+import { FieldInfo, Position } from "../types/FieldInfo";
 /** components */
 import FileLine from "./formType/FileLine.vue";
 import DssDrawer from "./DssDrawer.vue";
@@ -128,30 +128,57 @@ const selectedBar = computed(() => {
 });
 
 const divs = ref<any[]>([]);
-let prevPosition: number = 0;
-function scrollToRef(position: number, _prevPosition?: number) {
-  if (!_prevPosition) {
-    _prevPosition = position;
+
+let positionList = ref<Position[]>([]);
+let prePositionList = ref<Position[]>([]);
+function scrollToRef(position: Position, preIndex: number) {
+  positionList.value.push({ fileName: targetTabName.value, index: preIndex });
+  prePositionList.value = [
+    { fileName: position.fileName, index: position.index },
+  ];
+  console.log("scrollToRef position:", position);
+
+  openTab(position.fileName);
+
+  let el: Element = divs.value[position.index];
+  if (el) {
+    el.scrollIntoView();
   }
-  console.log("scrollWin", position, _prevPosition);
-  let el: Element = divs.value[position];
+}
+
+function scrollToPrePostition(type: string) {
+  let el: Element | null = null;
+  if (type === "ArrowLeft") {
+    let pos = positionList.value.pop();
+    if (pos) {
+      prePositionList.value.push(pos);
+      openTab(pos.fileName);
+      el = divs.value[pos.index];
+    }
+  } else if (type === "ArrowRight") {
+    let pos = prePositionList.value.pop();
+    if (pos) {
+      positionList.value.push(pos);
+      openTab(pos.fileName);
+      el = divs.value[pos.index];
+    }
+  }
 
   if (el) {
     el.scrollIntoView();
-    prevPosition = _prevPosition;
   }
 }
 
 /**
- *
+ * onMounted
  */
 onMounted(() => {
   window.addEventListener("keydown", (e) => {
     if (e.altKey) {
-      if (e.key == "ArrowLeft") {
-        // 左
-        scrollToRef(prevPosition, 0); //TODO
+      if (e.key == "ArrowLeft" || e.key == "ArrowRight") {
+        scrollToPrePostition(e.key);
       }
+
       if (e.key === "l") {
         isShowJumpLine.value = !isShowJumpLine.value;
       }
@@ -163,15 +190,15 @@ onMounted(() => {
 });
 
 function openTab(key: string) {
-  key = key.trim();
-  console.log("openTab", { key, t: tabList.value });
-  let temp = fileInfoMap.value.get(key);
+  let fileName = key.trim();
+  console.log("openTab", { key: fileName, t: tabList.value });
+  let temp = fileInfoMap.value.get(fileName);
   if (temp) {
     // 如果上方tab不存在則添加
-    if (!tabList.value.some((e) => e.name === key)) {
+    if (!tabList.value.some((e) => e.name === fileName)) {
       tabList.value.push(temp);
     }
-    targetTabName.value = key.trim();
+    targetTabName.value = fileName.trim();
   }
 }
 
@@ -196,6 +223,7 @@ function handleTabRemove(name: string) {
 </script>
 
 <template>
+  <!-- {{ positionList }}{{ prePositionList }} -->
   <Drawer title="files" placement="right" :mask="false" v-model="isShowDrawer">
     <DssDrawer :dssInfoMap="fileInfoMap" @openTab="openTab" />
   </Drawer>
@@ -221,8 +249,8 @@ function handleTabRemove(name: string) {
       十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
     </Col>
     <Col span="3">
-      <Button type="primary" @click="isShowReadMe = true"
-        >Read Me{{ isShowReadMe }}</Button
+      <Button type="primary" @click="isShowReadMe = !isShowReadMe"
+        >Read Me</Button
       >
     </Col>
   </Row>
@@ -310,7 +338,11 @@ function handleTabRemove(name: string) {
     </div>
   </div>
   <ReadMe v-model:isShowReadMe="isShowReadMe" />
-  <JumpLine v-model:is-show="isShowJumpLine" @jump-to-line="scrollToRef" />
+  <JumpLine
+    v-model:is-show="isShowJumpLine"
+    :targetTabName="targetTabName"
+    @jump-to-line="scrollToRef"
+  />
 </template>
 
 <style scoped>

@@ -23,7 +23,7 @@ import { isBlank, isNotBlank, substr_by_bytes } from "../utils/StringUtils"
  * 
  * @param rl 原始行字串
  */
- function parseCalculationSpecification(rl: string): Map<string, RPGContent> {
+function parseCalculationSpecification(rl: string): Map<string, RPGContent> {
     let contentMap: Map<string, RPGContent> = new Map();
     contentMap.set('HEAD_COMMENT', { value: substr_by_bytes(rl, 0, 5), class: "comments" });
     contentMap.set('Form_Type', { value: substr_by_bytes(rl, 5, 1), view: "KeywordField", dic: "Form_Type_Dic" });
@@ -43,7 +43,7 @@ import { isBlank, isNotBlank, substr_by_bytes } from "../utils/StringUtils"
     contentMap.set('Resulting_Indicators_Hi', { value: substr_by_bytes(rl, 53, 2) });
     contentMap.set('Resulting_Indicators_Lo', { value: substr_by_bytes(rl, 55, 2) });
     contentMap.set('Resulting_Indicators_Eq', { value: substr_by_bytes(rl, 57, 2) });
-    contentMap.set('Comments', { value: substr_by_bytes(rl, 59, 20) });
+    contentMap.set('Comments', { value: substr_by_bytes(rl, 59, 20), class: "comments" });
 
     return contentMap;
 }

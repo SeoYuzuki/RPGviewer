@@ -2,7 +2,7 @@
  * 欄位資訊
  */
 class FieldInfo {
-    position: number;
+    position: Position;
     fieldName: string | undefined;    // 不該空
     info: {
         /** 提示框內容 */
@@ -14,4 +14,9 @@ class FieldInfo {
     }
 }
 
-export { FieldInfo };
+class Position {
+    fileName: string;
+    index: number;
+}
+
+export { FieldInfo, Position };

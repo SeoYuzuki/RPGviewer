@@ -9,6 +9,8 @@ const parseDdsFile = function (ddsFile: string): ParsedLine[] {
         let ezCut = ezCutUtil(rl);
         if (ezCut(7, 7) !== '*') { // if * at position 7 makes the entire line a comment.
             if (ezCut(6, 6) === 'A') {
+                // https://www.ibm.com/docs/en/i/7.1?topic=ddfd-positional-entries-display-files-positions-1-through-44
+
                 let contentMap: Map<string, RPGContent> = new Map();
                 contentMap.set('HEAD_COMMENT', { value: ezCut(1, 5), class: "comments" });
                 contentMap.set('Form Type', { value: ezCut(6, 6), view: "KeywordField", dic: "Form_Type_Dic" });
@@ -26,7 +28,7 @@ H               Specifies this as a help specification      Display only
                  */
                 contentMap.set('Type of Name', { value: ezCut(17, 17), class: "record" });
                 contentMap.set('Reserved1', { value: ezCut(18, 18) });
-                contentMap.set('Name', { value: ezCut(19, 28) });
+                contentMap.set('Name', { value: ezCut(19, 28), view: "ParameterField" });
                 contentMap.set('Reference', { value: ezCut(29, 29) });
                 contentMap.set('Length', { value: ezCut(30, 34) });
                 /**
@@ -47,7 +49,7 @@ H               Specifies this as a help specification      Display only
                    T                        Time
                    Z                        Timestamp
                  */
-                contentMap.set('Data type and keyboard shift', { value: ezCut(35, 35) });
+                contentMap.set('Data type and keyboard shift', { value: ezCut(35, 35), view: "KeywordField", dic: "Data_Type_And_Keyboard_Shift" });
 
                 contentMap.set('Decimal positions', { value: ezCut(36, 37) });
                 contentMap.set('Usage', { value: ezCut(38, 38) }); // Blank or O , I,B,H,M,P

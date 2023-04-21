@@ -13,6 +13,7 @@ interface KeywordsDic {
     readonly Record_Identifying_Indicator_Dic: Dic[];
     readonly Data_Type_Dic: Dic[];
     readonly File_Designation_Dic: Dic[];
+    readonly Data_Type_And_Keyboard_Shift: Dic[];
 }
 
 const opcdeDictionary: Dic[] = [
@@ -153,6 +154,24 @@ const Data_Type_Dic: Dic[] = [
     }
 ]
 
+const Data_Type_And_Keyboard_Shift: Dic[] = [
+    { keyword: " ", title: "Default", content: "", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+    { keyword: "X", title: "Alphabetic only", content: "Character", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+    { keyword: "A", title: "Alphanumeric shift", content: "Character", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+    { keyword: "N", title: "Numeric shift", content: "Character or numeric", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+    { keyword: "S", title: "Signed numeric", content: "Numeric", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+    { keyword: "Y", title: "Numeric only", content: "Numeric", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+    { keyword: "W", title: "Katakana (for Japan only)", content: "Character", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+    { keyword: "I", title: "Inhibit keyboard entry", content: "Character or numeric", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+    { keyword: "D", title: "Digits only", content: "Character or numeric", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+    { keyword: "M", title: "Numeric only", content: "character Character", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+    { keyword: "F", title: "Floating point", content: "Numeric", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+    { keyword: "L", title: "Date", content: "", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+    { keyword: "T", title: "Time", content: "", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+    { keyword: "Z", title: "Timestamp", content: "", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
+];
+
+
 /**
  * 
  */
@@ -228,7 +247,8 @@ const Keywords_Dic: KeywordsDic = {
     Opcde_Dic: opcdeDictionary,
     Record_Identifying_Indicator_Dic: Record_Identifying_Indicator_Dic,
     Data_Type_Dic: Data_Type_Dic,
-    File_Designation_Dic: File_Designation_Dic
+    File_Designation_Dic: File_Designation_Dic,
+    Data_Type_And_Keyboard_Shift: Data_Type_And_Keyboard_Shift
 }
 
 export type { KeywordsDic, FormTypeBar, Dic };

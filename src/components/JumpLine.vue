@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from "vue";
 import { Modal, Input } from "view-ui-plus";
+import { Position } from "../types/FieldInfo";
 
-const props = defineProps<{ isShow: boolean }>();
+const props = defineProps<{ isShow: boolean; targetTabName: string }>();
 const emit = defineEmits<{
   (e: "update:isShow", isShow: boolean): void;
-  (e: "jumpToLine", index: number): void;
+  (e: "jumpToLine", position: Position, preIndex: number): void;
 }>();
 
 const lineValue = ref<string>("");
@@ -33,7 +34,14 @@ watch(
 );
 
 function jumpToLine() {
-  emit("jumpToLine", parseInt(lineValue.value));
+  emit(
+    "jumpToLine",
+    {
+      fileName: props.targetTabName,
+      index: parseInt(lineValue.value),
+    },
+    -1
+  );
 }
 </script>
 
