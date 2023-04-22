@@ -6,7 +6,7 @@ import { getContentByFile } from "../utils/A1Utils";
 import AuxiliaryCross from "../utils/AuxiliaryCross";
 import { parseFile } from "../core/fileParse/fileParser";
 import {
-  privateFieldInfoMap,
+  linkMap,
   publicFieldInfoMap,
 } from "../core/FieldInfoParser";
 import { FileInfo, ParsedLine } from "../types/parsedRpgFile";
@@ -27,10 +27,11 @@ let openAuxiliaryCross = AuxiliaryCross().openAuxiliaryCross;
 
 /** 上傳的檔案列表 */
 const fileInfoMap = ref<Map<string, FileInfo>>(new Map());
-/** 當前Tab名稱 */
-const targetTabName = ref<string>("");
 /** tab顯示清單 */
 const tabList = ref<FileInfo[]>([]);
+
+/** 當前Tab名稱 */
+const targetTabName = ref<string>("");
 /** 當前渲染程式碼 */
 const parsedRpgFile = ref<ParsedLine[]>();
 /** 該文件之欄位資訊 */
@@ -40,7 +41,7 @@ const targetFieldInfoList = ref<FieldInfo[]>([]);
  */
 watch(targetTabName, (val, oldVa) => {
   parsedRpgFile.value = fileInfoMap.value.get(val)?.parsedLineList;
-  let temp = privateFieldInfoMap.value.get(val);
+  let temp = publicFieldInfoMap.value.get(val);
   console.log("fieldInfoList", temp);
   if (temp) {
     console.log("fieldInfoList", temp);
@@ -48,14 +49,17 @@ watch(targetTabName, (val, oldVa) => {
   }
 });
 
-/** 欄位資訊清單 共用+各自檔案 */
+/** 欄位資訊清單 target + linkMap */
 const fieldInfoList = computed(() => {
   let temp: FieldInfo[] = [];
-  console.log(publicFieldInfoMap.value);
-  publicFieldInfoMap.value.forEach((e) => {
-    console.log(e);
-    temp = temp.concat(e);
-  });
+  let linkList = linkMap.value.get(targetTabName.value);
+  linkList?.forEach(e => {
+    let fieldInfo = publicFieldInfoMap.value.get(e);
+    if (fieldInfo) {
+      temp = temp.concat(fieldInfo);
+    }
+  })
+
   return targetFieldInfoList.value.concat(temp);
 });
 
@@ -69,22 +73,18 @@ async function handleUpload(file: File): Promise<boolean> {
       .toLowerCase();
     let name = file.name.split(".")[0].trim();
     console.log(file, fileExtension);
-    let dssInfo: FileInfo;
     let res = await getContentByFile(file);
-
-    dssInfo = {
+    let fileInfo: FileInfo = {
       parsedLineList: parseFile(res, name, fileExtension),
-      fileName: file.name,
-      name: name,
-      fileExtension: fileExtension,
+      fileRawName: file.name,
+      fileName: name,
+      fileExtension: fileExtension
     };
-    tabList.value = tabList.value.filter((e) => e.name !== name);
-    tabList.value.push(dssInfo);
-    fileInfoMap.value.set(file.name.split(".")[0].trim(), dssInfo);
+    tabList.value = tabList.value.filter((e) => e.fileName !== name);
+    tabList.value.push(fileInfo);
+    fileInfoMap.value.set(file.name.split(".")[0].trim(), fileInfo);
 
-    fileInfoMap.value.set(file.name.split(".")[0].trim(), dssInfo);
 
-    // fieldInfoList.value = getFieldInfoList(temp);
     targetTabName.value = name;
   } catch (e) {
     console.log(e);
@@ -129,15 +129,19 @@ const selectedBar = computed(() => {
 
 const divs = ref<any[]>([]);
 
-let positionList = ref<Position[]>([]);
-let prePositionList = ref<Position[]>([]);
+let positionHistIndex = ref<number>(0);
+let positionHistList = ref<Position[]>([]);
 function scrollToRef(position: Position, preIndex: number) {
-  positionList.value.push({ fileName: targetTabName.value, index: preIndex });
-  prePositionList.value = [
-    { fileName: position.fileName, index: position.index },
-  ];
-  console.log("scrollToRef position:", position);
+  positionHistList.value = positionHistList.value.slice(0, positionHistIndex.value);
+  positionHistIndex.value = positionHistIndex.value + 2;
+  positionHistList.value.push({ fileName: targetTabName.value, index: preIndex });
+  positionHistList.value.push(position);
+  toPosition();
+}
 
+function toPosition() {
+  console.log("test:", positionHistIndex, positionHistList.value[positionHistIndex.value]);
+  let position = positionHistList.value[positionHistIndex.value - 1];
   openTab(position.fileName);
 
   let el: Element = divs.value[position.index];
@@ -146,26 +150,23 @@ function scrollToRef(position: Position, preIndex: number) {
   }
 }
 
-function scrollToPrePostition(type: string) {
-  let el: Element | null = null;
+/**
+ * 跳轉至前/後連結的位置
+ * @param type 
+ */
+function scrollToPrePostition(type: "ArrowRight" | "ArrowLeft") {
   if (type === "ArrowLeft") {
-    let pos = positionList.value.pop();
-    if (pos) {
-      prePositionList.value.push(pos);
-      openTab(pos.fileName);
-      el = divs.value[pos.index];
+    if (positionHistIndex.value < 2) {
+      return;
     }
+    positionHistIndex.value--;
+    toPosition();
   } else if (type === "ArrowRight") {
-    let pos = prePositionList.value.pop();
-    if (pos) {
-      positionList.value.push(pos);
-      openTab(pos.fileName);
-      el = divs.value[pos.index];
+    if (positionHistIndex.value >= positionHistList.value.length) {
+      return;
     }
-  }
-
-  if (el) {
-    el.scrollIntoView();
+    positionHistIndex.value++;
+    toPosition();
   }
 }
 
@@ -183,7 +184,7 @@ onMounted(() => {
         isShowJumpLine.value = !isShowJumpLine.value;
       }
       if (e.key === "i") {
-        console.log(fieldInfoList.value, publicFieldInfoMap.value);
+        console.log(fieldInfoList.value, publicFieldInfoMap.value, linkMap.value);
       }
     }
   });
@@ -195,7 +196,7 @@ function openTab(key: string) {
   let temp = fileInfoMap.value.get(fileName);
   if (temp) {
     // 如果上方tab不存在則添加
-    if (!tabList.value.some((e) => e.name === fileName)) {
+    if (!tabList.value.some((e) => e.fileName === fileName)) {
       tabList.value.push(temp);
     }
     targetTabName.value = fileName.trim();
@@ -218,12 +219,11 @@ function handleDragDrop(
 
 function handleTabRemove(name: string) {
   console.log(name);
-  tabList.value = tabList.value.filter((e) => e.name != name);
+  tabList.value = tabList.value.filter((e) => e.fileName != name);
 }
 </script>
 
 <template>
-  <!-- {{ positionList }}{{ prePositionList }} -->
   <Drawer title="files" placement="right" :mask="false" v-model="isShowDrawer">
     <DssDrawer :dssInfoMap="fileInfoMap" @openTab="openTab" />
   </Drawer>
@@ -232,83 +232,46 @@ function handleTabRemove(name: string) {
       <Button icon="ios-cloud-upload-outline">upload files</Button>
     </Upload>
     <Button @click="isShowDrawer = !isShowDrawer" type="primary">files</Button>
-
-    <!-- <Col span="4">
-        跳至
-        <i-Input
-          ref="jumpLine"
-          v-model="lineValue"
-          placeholder="alt + l"
-          style="width: 100px"
-          @keypress="jumpToLine"
-        >
-        </i-Input>
-        行
-    </Col> -->
     <Col span="5">
-      十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
+    十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
     </Col>
     <Col span="3">
-      <Button type="primary" @click="isShowReadMe = !isShowReadMe"
-        >Read Me</Button
-      >
+    <Button type="primary" @click="isShowReadMe = !isShowReadMe">Read Me</Button>
     </Col>
   </Row>
-  <Tabs
-    v-model="targetTabName"
-    type="card"
-    closable
-    :draggable="true"
-    @on-drag-drop="handleDragDrop"
-    @on-tab-remove="handleTabRemove"
-  >
-    <TabPane
-      v-for="(fileInfo, index) in tabList"
-      :key="index"
-      :label="fileInfo.fileName"
-      :name="fileInfo.name"
-    >
+  <Tabs v-model="targetTabName" type="card" closable :draggable="true" @on-drag-drop="handleDragDrop"
+    @on-tab-remove="handleTabRemove">
+    <TabPane v-for="(fileInfo, index) in tabList" :key="index" :label="fileInfo.fileRawName" :name="fileInfo.fileName">
     </TabPane>
   </Tabs>
   <Row :gutter="0">
     <Col span="18">
-      {{
-        "________________1_________2_________3_________4_________5_________6_________7_________8"
-      }}</Col
-    >
+    {{
+      "________________1_________2_________3_________4_________5_________6_________7_________8"
+    }}</Col>
     <Col span="18">
-      {{
-        "_______12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-      }}</Col
-    >
+    {{
+      "_______12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+    }}</Col>
     <Col span="18"> {{ "__INDEX" }}{{ selectedBar }} </Col>
     <Col span="6">
-      <Select v-model="selectedBarModel" style="width: 250px" size="small">
-        <i-Option
-          v-for="item in FORM_TYPE_BAR_LIST"
-          :value="item.value"
-          :key="item.value"
-        >
-          <span>{{ item.label }}</span>
-          <span style="float: right; color: #ccc">{{ item.value }}</span>
-        </i-Option>
-      </Select>
+    <Select v-model="selectedBarModel" style="width: 250px" size="small">
+      <i-Option v-for="item in FORM_TYPE_BAR_LIST" :value="item.value" :key="item.value">
+        <span>{{ item.label }}</span>
+        <span style="float: right; color: #ccc">{{ item.value }}</span>
+      </i-Option>
+    </Select>
     </Col>
   </Row>
 
   <div class="text-block0">
     <div class="container">
       <div class="cont_elements">
-        <div
-          v-for="(parsedLine, index) in parsedRpgFile"
-          :class="getElementClass(index)"
-          :ref="
-            (el) => {
-              divs[index] = el;
-            }
-          "
-          @click="onElementClicked(parsedLine, index)"
-        >
+        <div v-for="(parsedLine, index) in parsedRpgFile" :class="getElementClass(index)" :ref="
+          (el) => {
+            divs[index] = el;
+          }
+        " @click="onElementClicked(parsedLine, index)">
           <!-- {{ rl.rawRl }} -->
           <Poptip :title="'title'" width="500">
             <template #content> {{ parsedLine }}</template>
@@ -317,32 +280,21 @@ function handleTabRemove(name: string) {
           </Poptip>
           <!-- 整行註解 -->
           <span v-if="parsedLine.formType === 'comments'" class="comments">
-            {{ parsedLine.rawRl }}</span
-          >
+            {{ parsedLine.rawRl }}</span>
           <span v-else>
-            <FileLine
-              :parsed-line="parsedLine"
-              :fieldInfoList="fieldInfoList"
-              @open-dds="openTab"
-              @scroll-to-ref="scrollToRef"
-            />
+            <FileLine :parsed-line="parsedLine" :fieldInfoList="fieldInfoList" @open-dds="openTab"
+              @scroll-to-ref="scrollToRef" />
             <span v-if="parsedLine.formType === 'unknown'" class="non">
-              {{ parsedLine.rawRl }}</span
-            >
+              {{ parsedLine.rawRl }}</span>
             <span v-if="parsedLine.formType === 'unknown2'" class="non2">
-              {{ parsedLine.rawRl }}</span
-            >
+              {{ parsedLine.rawRl }}</span>
           </span>
         </div>
       </div>
     </div>
   </div>
   <ReadMe v-model:isShowReadMe="isShowReadMe" />
-  <JumpLine
-    v-model:is-show="isShowJumpLine"
-    :targetTabName="targetTabName"
-    @jump-to-line="scrollToRef"
-  />
+  <JumpLine v-model:is-show="isShowJumpLine" :targetTabName="targetTabName" @jump-to-line="scrollToRef" />
 </template>
 
 <style scoped>

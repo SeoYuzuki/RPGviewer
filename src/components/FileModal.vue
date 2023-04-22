@@ -27,7 +27,7 @@ function onElementClicked(rl: ParsedLine, index: number) {
     width="900"
     :transfer="false"
     :mask="false"
-    :title="fileInfo?.fileName"
+    :title="fileInfo?.fileRawName"
   >
     <div class="text-block0">
       <div class="container">

@@ -1,7 +1,7 @@
 import { isBlank, isNotBlank, substr_by_bytes, ezCutUtil } from "../../utils/StringUtils"
 import { ParsedLine, RPGContent } from "../../types/parsedRpgFile"
-import parseExtensionSpecification from "../parseE"
-import parseCalculationSpecification from "../parseC"
+import parseExtensionSpecification from "./parseE"
+import parseCalculationSpecification from "./parseC"
 import {
     parseRecordIdentificationEntries_I
     , parseFieldDescriptionEntries_J
@@ -10,9 +10,9 @@ import {
     , parseDataStructureSpecificationEntries
     , parseDataStructureSubfieldSpecifications
     , parseNamedConstantSpecifications
-} from "../parseI"
+} from "./parseI"
 
-import { parseContinuationLines, parseFileDescriptionSpecification } from "../parseF"
+import { parseContinuationLines, parseFileDescriptionSpecification } from "./parseF"
 
 /** https://www.ibm.com/docs/en/rdfi/9.6.0?topic=rpg400-language-reference#ToC_286 */
 

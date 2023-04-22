@@ -5,8 +5,9 @@ DOING
 1. 加強A卡分析
 
 BUG
-1. A卡判斷連續行
-2. 左右鍵導向
+1. A卡判斷連續行 
+2. 左右鍵導向    fix?
+3. keywordField Poptip 沒reactive  fixed
 
 TODO 
 1. formType O

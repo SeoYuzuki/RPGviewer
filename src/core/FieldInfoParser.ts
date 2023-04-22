@@ -5,8 +5,8 @@ import { ref } from "@vue/reactivity";
 
 
 const publicFieldInfoMap = ref<Map<string, FieldInfo[]>>(new Map());
-const privateFieldInfoMap = ref<Map<string, FieldInfo[]>>(new Map())
-
+//const privateFieldInfoMap = ref<Map<string, FieldInfo[]>>(new Map())
+const linkMap = ref<Map<string, string[]>>(new Map());
 
 /**
  * 
@@ -211,16 +211,21 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                         openDss: map.get("File Name")?.value
                     }
                 });
-            }
 
+                if (linkMap.value.get(fileName)) {
+                    linkMap.value.get(fileName)?.push(map.get("File Name")?.value.trim() ?? "")
+                } else {
+                    linkMap.value.set(fileName, [map.get("File Name")?.value.trim() ?? ""])
+                }
+            }
         }
     }
 
-    if (type === "private") {
-        privateFieldInfoMap.value.set(fileName, fieldInfoList);
-    } else if (type === "public") {
-        publicFieldInfoMap.value.set(fileName, fieldInfoList);
-    }
+    // if (type === "private") {
+    //     privateFieldInfoMap.value.set(fileName, fieldInfoList);
+    // } else if (type === "public") {
+    publicFieldInfoMap.value.set(fileName, fieldInfoList);
+    // }
 
 }
 
@@ -236,9 +241,7 @@ const saveFieldInfoList_A = function (parsedRpgFile: ParsedLine[], name: string,
                 fileName: name,
                 index: rl.index
             };
-            console.log({ v: map.get("Type of Name")?.value })
             if (map.get("Type of Name")?.value === 'R') {
-                console.log('123')
                 fieldInfoList.push({
                     position: position,
                     fieldName: map.get("Name")?.value,
@@ -262,12 +265,8 @@ const saveFieldInfoList_A = function (parsedRpgFile: ParsedLine[], name: string,
         }
     }
 
-    if (type === "private") {
-        privateFieldInfoMap.value.set(name, fieldInfoList);
-    } else if (type === "public") {
-        publicFieldInfoMap.value.set(name, fieldInfoList);
-        console.log(publicFieldInfoMap.value)
-    }
+    publicFieldInfoMap.value.set(name, fieldInfoList);
+
 }
 
-export { saveFieldInfoList, saveFieldInfoList_A, publicFieldInfoMap, privateFieldInfoMap }
+export { saveFieldInfoList, saveFieldInfoList_A, publicFieldInfoMap, linkMap }

@@ -1,7 +1,9 @@
 import { parseRpgFile } from "./RpgFileParser";
 import { parseDdsFile } from "./DDSFileParser";
-import { ParsedLine } from "../../types/parsedRpgFile";
-import { saveFieldInfoList, saveFieldInfoList_A } from "../FieldInfoParser"
+import { FileInfo, ParsedLine } from "../../types/parsedRpgFile";
+import { getContentByFile } from "../../utils/A1Utils";
+import { saveFieldInfoList, saveFieldInfoList_A, publicFieldInfoMap } from "../FieldInfoParser"
+import { ref } from "vue";
 
 function parseFile(rawFile: string, name: string, fileExtension: string): ParsedLine[] {
     let parsedFile: ParsedLine[] = [];
@@ -20,4 +22,7 @@ function parseFile(rawFile: string, name: string, fileExtension: string): Parsed
 }
 
 
+
+
 export { parseFile }
+

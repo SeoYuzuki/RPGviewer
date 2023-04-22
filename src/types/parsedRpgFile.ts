@@ -18,9 +18,13 @@ class ParsedLine {
  */
 class FileInfo {
     parsedLineList: ParsedLine[]
-    name: string
+    /** 檔名，也是key */
     fileName: string
+    /** 檔案原始名 */
+    fileRawName: string
+    /** 副檔名 */
     fileExtension: string
+
 }
 
 /**

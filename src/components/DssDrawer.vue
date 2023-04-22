@@ -15,7 +15,7 @@ function showModal(key: string) {
 
 <template>
   <template v-for="[key, value] in dssInfoMap">
-    <p @click="showModal(key)">{{ value.fileName }}</p>
+    <p @click="showModal(key)">{{ value.fileRawName }}</p>
   </template>
 </template>
 

@@ -1,5 +1,5 @@
-import { RPGContent } from "../types/parsedRpgFile";
-import { isBlank, isNotBlank, substr_by_bytes } from "../utils/StringUtils"
+import { RPGContent } from "../../types/parsedRpgFile";
+import { isBlank, isNotBlank, substr_by_bytes } from "../../utils/StringUtils"
 
 /** parse Extension Specification
  * 

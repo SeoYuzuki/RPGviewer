@@ -1,0 +1,18 @@
+     ....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+     A* DISPLAY FILE EXAMPLE
+     A*
+     A                                      REF(PAYROLL)
+     A          R MENU
+     A          H                           HLPARA(1 1 12 80)
+     A                                      HLPRCD(RECORD1 FILEA)
+     A N01
+     AO 02        FLDA          20I 2O  2  2DSPATR(HI)
+     A            FLDB          22N 2B  3  2
+     A  72 73
+     AO 60 61 62
+     AA 63                                  DSPATR(HI)
+     A            FLDC           7Y 0B  7 20DSPATR(RI PC)
+     A  42 43
+     AO 60 61
+     AO 62                              9  2'Constant'
+     A            FLDD      R          11  2

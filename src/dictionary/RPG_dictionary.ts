@@ -16,6 +16,9 @@ interface KeywordsDic {
     readonly Data_Type_And_Keyboard_Shift: Dic[];
 }
 
+/**
+ * https://www.ibm.com/docs/en/rdfi/9.6.0?topic=rpg400-language-reference#ToC
+ */
 const opcdeDictionary: Dic[] = [
     {
         keyword: "PLIST",
@@ -67,7 +70,12 @@ const opcdeDictionary: Dic[] = [
         content: "The declarative TAG operation names the label that identifies the destination of a GOTO (Go To) or CABxx (Compare and Branch) operation. ",
         website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh342.htm#HDRZZTAG"
     },
-
+    {
+        keyword: "CHAIN",
+        title: "CHAIN (Random Retrieval from a File)",
+        content: "The CHAIN operation retrieves a record from a full procedural file (F in position 16 of the file description specifications), sets a record identifying indicator on (if specified on the input specifications), and places the data from the record into the input fields.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh270.html#HDRZZCHAIN"
+    },
 ];
 
 const Form_Type_Dic: Dic[] = [
@@ -88,6 +96,20 @@ const Form_Type_Dic: Dic[] = [
         title: "Extension Specifications",
         content: "Extension specifications describe all record address files, arrays, and tables. A maximum of 200 arrays and tables can be used in a program.",
         website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh68.htm#HDREXTSPEC"
+    },
+    {
+
+        keyword: "F",
+        title: "File Description Specifications",
+        content: 'File description specifications identify each file used by a program. One file-description specification statement is required for each file in the program.',
+        website: 'https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh34.html#HDRFILEDES'
+    },
+    {
+
+        keyword: "O",
+        title: "Output Specifications",
+        content: 'Output specifications describe the record and the format of fields in a program described output file and when the record is to be written. Output specifications are optional for an externally described file. Output specifications can be divided into two categories: record identification and control (positions 7 through 37), and field description and control (positions 23 through 70). These specifications are entered on the RPG/400 Output Specifications.',
+        website: 'https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh190.html#HDROUTSPEC'
     }
 ]
 
@@ -229,6 +251,18 @@ const FORM_TYPE_BAR_LIST: FormTypeBar[] = [
         label: 'F',
         tag: 'FC',
         bar: ".....F............Ext-record..................RcdnbrKOptionEntry+++...."
+    },
+    {
+        value: 'Physical_And_logical_Files',
+        label: 'A',
+        tag: 'PF',
+        bar: ".....A..........T.Name++++++RLen++TDpB......Functions++++++++++++++++++"
+    },
+    {
+        value: 'LF',
+        label: 'A',
+        tag: 'LF',
+        bar: ".....A..........T.Name++++++.Len++TDpB......Functions++++++++++++++++++"
     },
 ]
 

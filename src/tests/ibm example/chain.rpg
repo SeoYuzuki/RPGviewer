@@ -1,0 +1,33 @@
+     *...1....+....2....+....3....+....4....+....5....+....6....+....7...
+     CL0N01N02N03Factor1+++OpcdeFactor2+++ResultLenDHHiLoEqComments++++++
+     C*
+     C*  The CHAIN operation uses the value contained in the search
+     C*  argument KEY to retrieve a record of the record type REC1 from
+     C*  an externally described file. If no record is found of the
+     C*  specified type that has a key field equal to the search
+     C*  argument, indicator 72 is set on.  A complex key with a KLIST is
+     C*  used to retrieve records from files that have a composite key.
+     C*  If a record of the specified type is found that has a key field
+     C*  equal to the search argument, the calculations after the GOTO
+     C*  operation are processed.
+     C*
+     C           KEY       CHAINREC1                 72    INDICATOR 72
+     C*                                                    IF NOT FOUND
+     C           KEY       KLIST
+     C                     KFLD           FLD1
+     C                     KFLD           FLD2
+     C           *IN72     IFEQ *OFF
+     C*
+     CL0N01N02N03Factor1+++OpcdeFactor2+++ResultLenDHHiLoEqComments++++++
+     C*
+     C*  The UPDAT operation modifies all the fields in the REC1 record.
+     C*
+     C                     UPDATREC1                       UPDATE
+     C                     ENDIF
+     C*
+     CL0N01N02N03Factor1+++OpcdeFactor2+++ResultLenDHHiLoEqComments++++++
+     C*
+     C*  The following example shows a CHAIN with no lock.
+     C*
+     C                     MOVE 3         KEY
+     C           KEY       CHAININPUT               N
