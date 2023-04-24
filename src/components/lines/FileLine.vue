@@ -11,7 +11,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
   (e: "scrollToRef", position: Position, preIndex: number): void;
-  (e: "openDds", name: string): void;
+  // (e: "openDds", name: string): void;
 }>();
 
 let formContent = props.parsedLine.formContent;
@@ -20,9 +20,9 @@ function scrollToRef(position: Position, preIndex: number) {
   emit("scrollToRef", position, preIndex);
 }
 
-function openDds(name: string) {
-  emit("openDds", name);
-}
+// function openDds(name: string) {
+//   emit("openDds", name);
+// }
 </script>
 
 <template>
@@ -40,7 +40,6 @@ function openDds(name: string) {
           :field-text="value.value"
           :index="parsedLine.index"
           @scroll-to-ref="scrollToRef"
-          @openDds="openDds"
         ></ParameterField>
       </template>
       <span v-else :class="value.class">{{ value.value }}</span>

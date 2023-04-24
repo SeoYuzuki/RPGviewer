@@ -9,7 +9,6 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
   (e: "scrollToRef", position: Position, preIndex: number): void;
-  (e: "openDds", name: string): void;
 }>();
 
 const targetFieldInfo = computed(() => {
@@ -58,7 +57,12 @@ function onClick(e: MouseEvent) {
   console.log(props, targetFieldInfo);
   if (e.ctrlKey) {
     if (targetFieldInfo.value?.info.openDss) {
-      emit("openDds", targetFieldInfo.value?.info.openDss);
+      // emit("openDds", targetFieldInfo.value?.info.openDss);
+      emit(
+        "scrollToRef",
+        { fileName: targetFieldInfo.value?.info.openDss, index: 0 },
+        props.index
+      );
       return;
     }
 
@@ -67,9 +71,9 @@ function onClick(e: MouseEvent) {
     }
   }
 }
-function handleMouseEvent(e: any) {
-  console.log(targetFieldInfo);
-}
+// function handleMouseEvent(e: any) {
+//   console.log(targetFieldInfo);
+// }
 </script>
 
 <template>
@@ -81,11 +85,7 @@ function handleMouseEvent(e: any) {
       word-wrap
       transfer
     >
-      <span
-        :class="clickableFieldClass"
-        @click="onClick"
-        @mouseover.ctrl="handleMouseEvent"
-      >
+      <span :class="clickableFieldClass" @click="onClick">
         {{ fieldText }}
       </span>
       <template #content>
