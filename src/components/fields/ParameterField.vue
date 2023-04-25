@@ -54,7 +54,7 @@ function getStaticFieldClass() {
 }
 
 function onClick(e: MouseEvent) {
-  console.log(props, targetFieldInfo);
+  console.log(props, targetFieldInfo.value);
   if (e.ctrlKey) {
     if (targetFieldInfo.value?.info.openDss) {
       // emit("openDds", targetFieldInfo.value?.info.openDss);
@@ -78,13 +78,7 @@ function onClick(e: MouseEvent) {
 
 <template>
   <span>
-    <Poptip
-      v-if="targetFieldInfo"
-      class="poptip"
-      width="300"
-      word-wrap
-      transfer
-    >
+    <Poptip v-if="targetFieldInfo" class="poptip" width="300" word-wrap transfer>
       <span :class="clickableFieldClass" @click="onClick">
         {{ fieldText }}
       </span>
@@ -93,7 +87,7 @@ function onClick(e: MouseEvent) {
       </template>
     </Poptip>
     <template v-else>
-      <span :class="getStaticFieldClass()">
+      <span :class="getStaticFieldClass()" @click="onClick">
         {{ fieldText }}
       </span>
     </template>

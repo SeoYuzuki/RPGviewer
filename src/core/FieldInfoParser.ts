@@ -7,6 +7,7 @@ import { ref } from "@vue/reactivity";
 const publicFieldInfoMap = ref<Map<string, FieldInfo[]>>(new Map());
 //const privateFieldInfoMap = ref<Map<string, FieldInfo[]>>(new Map())
 const linkMap = ref<Map<string, string[]>>(new Map());
+console.log("!!!!!")
 
 /**
  * 

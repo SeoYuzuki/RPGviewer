@@ -30,36 +30,7 @@ const tabList = ref<FileInfo[]>([]);
 
 /** 當前Tab名稱 */
 const targetTabName = ref<string>("");
-/** 當前渲染程式碼 */
-const parsedRpgFile = ref<ParsedLine[]>();
-/** 該文件之欄位資訊 */
-const targetFieldInfoList = ref<FieldInfo[]>([]);
-/**
- * 當tab文件切換時
- */
-watch(targetTabName, (val, oldVa) => {
-  parsedRpgFile.value = fileInfoMap.value.get(val)?.parsedLineList;
-  let temp = publicFieldInfoMap.value.get(val);
-  console.log("fieldInfoList", temp);
-  if (temp) {
-    console.log("fieldInfoList", temp);
-    targetFieldInfoList.value = temp;
-  }
-});
 
-/** 欄位資訊清單 target + linkMap */
-const fieldInfoList = computed(() => {
-  let temp: FieldInfo[] = [];
-  let linkList = linkMap.value.get(targetTabName.value);
-  linkList?.forEach((e) => {
-    let fieldInfo = publicFieldInfoMap.value.get(e);
-    if (fieldInfo) {
-      temp = temp.concat(fieldInfo);
-    }
-  });
-
-  return targetFieldInfoList.value.concat(temp);
-});
 
 /**
  * 上傳檔案事件
@@ -97,32 +68,6 @@ let isShowReadMe = ref<boolean>(false);
 /** 是否顯示跳行 */
 let isShowJumpLine = ref<boolean>(false);
 
-let lineClicked = ref<number>(0);
-let selectedBarModel = ref<string>();
-
-function getElementClass(index: number) {
-  if (index == lineClicked.value) {
-    return "focus-line";
-  } else return "element";
-}
-
-function onElementClicked(rl: ParsedLine, index: number) {
-  console.log(rl.formTypeSpecifications, index, rl);
-  lineClicked.value = index;
-  if (rl.formTypeSpecifications) {
-    selectedBarModel.value = rl.formTypeSpecifications;
-  }
-}
-const selectedBar = computed(() => {
-  if (selectedBarModel.value) {
-    //console.log(selectedBarModel.value);
-    return (
-      FORM_TYPE_BAR_LIST.find((e) => e.value === selectedBarModel.value)?.bar ??
-      ""
-    );
-  }
-  return "";
-});
 
 /** 位置紀錄指標 */
 let positionHistIndex = ref<number>(1);
@@ -188,7 +133,7 @@ onMounted(() => {
       }
       if (e.key === "i") {
         console.log({
-          fieldInfoList: fieldInfoList.value,
+          // fieldInfoList: fieldInfoList.value,
           publicFieldInfoMap: publicFieldInfoMap.value,
           linkMap: linkMap.value,
         });
@@ -240,80 +185,26 @@ function handleTabRemove(name: string) {
     </Upload>
     <Button @click="isShowDrawer = !isShowDrawer" type="primary">files</Button>
     <Col span="5">
-      十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
+    十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
     </Col>
     <Col span="3">
-      <Button type="primary" @click="isShowReadMe = !isShowReadMe"
-        >Read Me</Button
-      >
+    <Button type="primary" @click="isShowReadMe = !isShowReadMe">Read Me</Button>
     </Col>
   </Row>
-  <Tabs
-    v-model="targetTabName"
-    type="card"
-    closable
-    :draggable="true"
-    @on-drag-drop="handleDragDrop"
-    @on-tab-remove="handleTabRemove"
-  >
-    <TabPane
-      v-for="(fileInfo, index) in tabList"
-      :key="index"
-      :label="fileInfo.fileRawName"
-      :name="fileInfo.fileName"
-    >
+  <Tabs v-model="targetTabName" type="card" closable :draggable="true" :animated="false" @on-drag-drop="handleDragDrop"
+    @on-tab-remove="handleTabRemove">
+    <TabPane v-for="(fileInfo, index) in tabList" :key="index" :label="fileInfo.fileRawName" :name="fileInfo.fileName">
+      <CodeView :fileInfoMap="fileInfoMap" :targetTabName="fileInfo.fileName" @scrollToRef="scrollToRef">
+      </CodeView>
     </TabPane>
   </Tabs>
-  <CodeView
-    v-if="parsedRpgFile"
-    :parsedRpgFile="parsedRpgFile"
-    :targetTabName="targetTabName"
-  ></CodeView>
+
 
   <ReadMe v-model:isShowReadMe="isShowReadMe" />
-  <JumpLine
-    v-model:is-show="isShowJumpLine"
-    :targetTabName="targetTabName"
-    @jump-to-line="scrollToRef"
-  />
+  <JumpLine v-model:is-show="isShowJumpLine" :targetTabName="targetTabName" @jump-to-line="scrollToRef" />
 </template>
 
 <style scoped>
-.text-block0 {
-  position: absolute;
-  background-color: rgb(0, 0, 0);
-  color: rgb(255, 255, 255);
-  height: 80%;
-  width: 100%;
-  /* position: absolute;
-      width: 100%;
-      left: 5%; */
-}
-
-.text-block1 {
-  background-color: rgb(42, 42, 42);
-  color: rgb(255, 255, 255);
-  /* height: 500px; */
-  /* width: 700px; */
-  font-family: "MingLiU";
-  /* position: absolute;
-      width: 100%;
-      left: 5%; */
-}
-
-.text-block {
-  white-space: pre-wrap;
-  /* font-size: v-bind("fontSize"); */
-  /* display: inline-block;
-        /* max-width: 200px; */
-  /* height: 100%; */
-  /* position: absolute; */
-  /* top: 50%; */
-  /* display: flex; */
-  /* justify-content: center; */
-  /* align-items: center; */
-}
-
 .bar {
   background-color: rgb(75, 16, 16);
   position: absolute;
@@ -321,21 +212,7 @@ function handleTabRemove(name: string) {
   top: 0;
 }
 
-.container {
-  white-space: pre-wrap;
-  position: relative;
-  height: 100%;
-}
 
-.cont_elements {
-  overflow-y: scroll;
-  height: 100%;
-}
-
-.element {
-  /* font-family: MingLiU; */
-  position: relative;
-}
 
 .comments {
   color: #3ba000;
