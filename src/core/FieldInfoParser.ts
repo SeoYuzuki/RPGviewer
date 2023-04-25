@@ -107,18 +107,18 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                     }
                 });
             } else if (rl.formTypeSpecifications === "Record_Identification_External") {
-                fieldInfoList.push({
-                    position: {
-                        fileName: fileName,
-                        index: rl.index
-                    },
-                    fieldName: map.get("Record Name")?.value,
-                    info: {
-                        content: "Record",
-                        class: "record",
-                        title: "",
-                    }
-                });
+                // fieldInfoList.push({
+                //     position: {
+                //         fileName: fileName,
+                //         index: rl.index
+                //     },
+                //     fieldName: map.get("Record Name")?.value,
+                //     info: {
+                //         content: "Record",
+                //         class: "record",
+                //         title: "",
+                //     }
+                // });
             } else if (rl.formTypeSpecifications === "Field_Description_External") {
                 fieldInfoList.push({
                     position: {

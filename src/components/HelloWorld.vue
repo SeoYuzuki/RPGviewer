@@ -230,7 +230,6 @@ function handleTabRemove(name: string) {
 </script>
 
 <template>
-  {{ positionHistList }}{{ positionHistIndex }}
   <Drawer title="files" placement="right" :mask="false" v-model="isShowDrawer">
     <DssDrawer :dssInfoMap="fileInfoMap" @openTab="openTab" />
   </Drawer>
