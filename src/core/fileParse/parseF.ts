@@ -105,7 +105,7 @@ function parseContinuationLines(rl: string): Map<string, RPGContent> {
     contentMap.set('Line', { value: ezCut(3, 5) });
     contentMap.set('Form Type', { value: ezCut(6, 6), view: "KeywordField", dic: "Form_Type_Dic" });
     contentMap.set('Reserved1', { value: ezCut(7, 18) }); // must Blank
-    contentMap.set('External Name', { value: ezCut(19, 28) });
+    contentMap.set('External Name', { value: ezCut(19, 28), view: "ParameterField" });
     contentMap.set('Reserved2', { value: ezCut(29, 46) }); // must Blank
     contentMap.set('Record Number Field', { value: ezCut(47, 52) });
     contentMap.set('Continuation Lines', { value: ezCut(53, 53) }); // must K
