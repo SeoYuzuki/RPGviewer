@@ -14,6 +14,7 @@ import FileLine from "./lines/FileLine.vue";
 import DssDrawer from "./DssDrawer.vue";
 import ReadMe from "./ReadMe.vue";
 import JumpLine from "./JumpLine.vue";
+import CodeView from "./CodeView.vue";
 
 /** 十字線事件 */
 let openAuxiliaryCross = AuxiliaryCross().openAuxiliaryCross;
@@ -263,72 +264,12 @@ function handleTabRemove(name: string) {
     >
     </TabPane>
   </Tabs>
-  <Row :gutter="0">
-    <Col span="18">
-      {{
-        "________________1_________2_________3_________4_________5_________6_________7_________8"
-      }}</Col
-    >
-    <Col span="18">
-      {{
-        "_______12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-      }}</Col
-    >
-    <Col span="18"> {{ "__INDEX" }}{{ selectedBar }} </Col>
-    <Col span="6">
-      <Select v-model="selectedBarModel" style="width: 250px" size="small">
-        <i-Option
-          v-for="item in FORM_TYPE_BAR_LIST"
-          :value="item.value"
-          :key="item.value"
-        >
-          <span>{{ item.label }}</span>
-          <span style="float: right; color: #ccc">{{ item.value }}</span>
-        </i-Option>
-      </Select>
-    </Col>
-  </Row>
+  <CodeView
+    v-if="parsedRpgFile"
+    :parsedRpgFile="parsedRpgFile"
+    :targetTabName="targetTabName"
+  ></CodeView>
 
-  <div class="text-block0">
-    <div class="container">
-      <div class="cont_elements">
-        <div
-          v-for="(parsedLine, index) in parsedRpgFile"
-          :class="getElementClass(index)"
-          :ref="
-            (el) => {
-              divs[index] = el;
-            }
-          "
-          @click="onElementClicked(parsedLine, index)"
-        >
-          <!-- {{ rl.rawRl }} -->
-          <Poptip :title="'title'" width="500">
-            <template #content> {{ parsedLine }}</template>
-
-            {{ " " + (index + 1).toString().padStart(5, "0") }}
-          </Poptip>
-          <!-- 整行註解 -->
-          <span v-if="parsedLine.formType === 'comments'" class="comments">
-            {{ parsedLine.rawRl }}</span
-          >
-          <span v-else>
-            <FileLine
-              :parsed-line="parsedLine"
-              :fieldInfoList="fieldInfoList"
-              @scroll-to-ref="scrollToRef"
-            />
-            <span v-if="parsedLine.formType === 'unknown'" class="non">
-              {{ parsedLine.rawRl }}</span
-            >
-            <span v-if="parsedLine.formType === 'unknown2'" class="non2">
-              {{ parsedLine.rawRl }}</span
-            >
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
   <ReadMe v-model:isShowReadMe="isShowReadMe" />
   <JumpLine
     v-model:is-show="isShowJumpLine"
