@@ -2,14 +2,16 @@
 import { ref, onMounted } from "vue";
 import { Button } from "view-ui-plus";
 
-import { getContentByFile } from "../utils/A1Utils";
 import AuxiliaryCross from "../utils/AuxiliaryCross";
-import { parseFile } from "../core/fileParse/fileParser";
+import {
+  parseFile as parseFile,
+  fileInfoMap,
+} from "../core/fileParse/fileParser";
 import { linkMap, publicFieldInfoMap } from "../core/FieldInfoParser";
-import { FileInfo, ParsedLine } from "../types/parsedRpgFile";
-import { FieldInfo, Position } from "../types/FieldInfo";
+import { FileInfo } from "../types/parsedRpgFile";
+import { Position } from "../types/FieldInfo";
 /** components */
-import DssDrawer from "./DssDrawer.vue";
+import FileDrawer from "./FileDrawer.vue";
 import ReadMe from "./ReadMe.vue";
 import JumpLine from "./JumpLine.vue";
 import CodeView from "./CodeView.vue";
@@ -21,11 +23,8 @@ let openAuxiliaryCross = AuxiliaryCross().openAuxiliaryCross;
  * 上傳
  */
 
-/** 上傳的檔案列表 */
-const fileInfoMap = ref<Map<string, FileInfo>>(new Map());
 /** tab顯示清單 */
 const tabList = ref<FileInfo[]>([]);
-
 /** 當前Tab名稱 */
 const targetTabName = ref<string>("");
 
@@ -33,28 +32,7 @@ const targetTabName = ref<string>("");
  * 上傳檔案事件
  */
 async function handleUpload(file: File): Promise<boolean> {
-  try {
-    let fileExtension = (/[.]/.exec(file.name) ? file.name.split(".")[1] : "")
-      .trim()
-      .toLowerCase();
-    let name = file.name.split(".")[0].trim();
-    console.log(file, fileExtension);
-    let res = await getContentByFile(file);
-    let fileInfo: FileInfo = {
-      parsedLineList: parseFile(res, name, fileExtension),
-      fileRawName: file.name,
-      fileName: name,
-      fileExtension: fileExtension,
-    };
-    tabList.value = tabList.value.filter((e) => e.fileName !== name);
-    tabList.value.push(fileInfo);
-    fileInfoMap.value.set(file.name.split(".")[0].trim(), fileInfo);
-
-    targetTabName.value = name;
-  } catch (e) {
-    console.log(e);
-  }
-
+  parseFile(file, tabList);
   return false;
 }
 
@@ -70,8 +48,6 @@ let positionHistIndex = ref<number>(1);
 /** 位置紀錄清單 */
 let positionHistList = ref<Position[]>([]);
 function scrollToRef(position: Position, preIndex: number) {
-  console.log(123, position, preIndex);
-
   positionHistList.value = positionHistList.value.slice(
     0,
     positionHistIndex.value - 1
@@ -182,7 +158,7 @@ function handleTabRemove(name: string) {
 
 <template>
   <Drawer title="files" placement="right" :mask="false" v-model="isShowDrawer">
-    <DssDrawer :dssInfoMap="fileInfoMap" @openTab="openTab" />
+    <FileDrawer :dssInfoMap="fileInfoMap" @openTab="openTab" />
   </Drawer>
   <Row :gutter="16">
     <Upload multiple :before-upload="handleUpload">

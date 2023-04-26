@@ -32,6 +32,7 @@ function scrollToRef(position: Position, preIndex: number) {
         <KeywordField
           :keyword="value.value"
           :dictionary="value.dic"
+          :span_class="value.class"
         ></KeywordField>
       </template>
       <template v-else-if="value.view === 'ParameterField'">

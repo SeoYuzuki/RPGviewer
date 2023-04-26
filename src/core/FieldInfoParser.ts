@@ -153,7 +153,7 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                         },
                         fieldName: map.get("Field Name")?.value,
                         info: {
-                            content: "Field Name",
+                            content: "Field of data structure",
                             title: "",
                         }
                     });

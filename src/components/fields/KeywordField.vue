@@ -66,9 +66,8 @@ function openUrl() {
 </template>
 
 <style scoped>
-/* C type */
-.opcde {
-  color: #9ab5ff;
+.white {
+  color: #ffffff;
 }
 
 .default_keyword {
