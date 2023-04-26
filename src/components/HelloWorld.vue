@@ -31,7 +31,6 @@ const tabList = ref<FileInfo[]>([]);
 /** 當前Tab名稱 */
 const targetTabName = ref<string>("");
 
-
 /**
  * 上傳檔案事件
  */
@@ -67,7 +66,6 @@ let isShowDrawer = ref<boolean>(false);
 let isShowReadMe = ref<boolean>(false);
 /** 是否顯示跳行 */
 let isShowJumpLine = ref<boolean>(false);
-
 
 /** 位置紀錄指標 */
 let positionHistIndex = ref<number>(1);
@@ -185,35 +183,47 @@ function handleTabRemove(name: string) {
     </Upload>
     <Button @click="isShowDrawer = !isShowDrawer" type="primary">files</Button>
     <Col span="5">
-    十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
+      十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
     </Col>
     <Col span="3">
-    <Button type="primary" @click="isShowReadMe = !isShowReadMe">Read Me</Button>
+      <Button type="primary" @click="isShowReadMe = !isShowReadMe"
+        >Read Me</Button
+      >
     </Col>
   </Row>
-  <Tabs v-model="targetTabName" type="card" closable :draggable="true" :animated="false" @on-drag-drop="handleDragDrop"
-    @on-tab-remove="handleTabRemove">
-    <TabPane v-for="(fileInfo, index) in tabList" :key="index" :label="fileInfo.fileRawName" :name="fileInfo.fileName">
-      <CodeView :fileInfoMap="fileInfoMap" :targetTabName="fileInfo.fileName" @scrollToRef="scrollToRef">
+  <Tabs
+    v-model="targetTabName"
+    type="card"
+    closable
+    :draggable="true"
+    :animated="false"
+    @on-drag-drop="handleDragDrop"
+    @on-tab-remove="handleTabRemove"
+  >
+    <TabPane
+      v-for="(fileInfo, index) in tabList"
+      :key="index"
+      :label="fileInfo.fileRawName"
+      :name="fileInfo.fileName"
+    >
+      <CodeView
+        :fileInfoMap="fileInfoMap"
+        :targetTabName="fileInfo.fileName"
+        @scrollToRef="scrollToRef"
+      >
       </CodeView>
     </TabPane>
   </Tabs>
 
-
   <ReadMe v-model:isShowReadMe="isShowReadMe" />
-  <JumpLine v-model:is-show="isShowJumpLine" :targetTabName="targetTabName" @jump-to-line="scrollToRef" />
+  <JumpLine
+    v-model:is-show="isShowJumpLine"
+    :targetTabName="targetTabName"
+    @jump-to-line="scrollToRef"
+  />
 </template>
 
 <style scoped>
-.bar {
-  background-color: rgb(75, 16, 16);
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-
-
 .comments {
   color: #3ba000;
 }

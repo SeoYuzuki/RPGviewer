@@ -11,7 +11,7 @@ const props = defineProps<{
   /** 當前Tab名稱 */
   targetTabName: string;
   /** 上傳的檔案列表 */
-  fileInfoMap: Map<string, FileInfo>
+  fileInfoMap: Map<string, FileInfo>;
 }>();
 
 const emit = defineEmits<{
@@ -28,8 +28,6 @@ const parsedRpgFile = computed(() => {
   return props.fileInfoMap.get(props.targetTabName)?.parsedLineList;
 });
 
-
-
 /** 欄位資訊清單 target + linkMap */
 const fieldInfoList = computed(() => {
   let temp: FieldInfo[] = [];
@@ -42,7 +40,8 @@ const fieldInfoList = computed(() => {
   });
 
   /** 該文件之欄位資訊 */
-  let targetFieldInfoList = publicFieldInfoMap.value.get(props.targetTabName) ?? [];
+  let targetFieldInfoList =
+    publicFieldInfoMap.value.get(props.targetTabName) ?? [];
   return targetFieldInfoList.concat(temp);
 });
 
@@ -69,43 +68,51 @@ const selectedBar = computed(() => {
   return "";
 });
 
-
 function scrollToRef(position: Position, preIndex: number) {
   emit("scrollToRef", position, preIndex);
 }
-
-
-
 </script>
 
 <template>
   <Row :gutter="0">
     <Col span="18">
-    {{
-      "________________1_________2_________3_________4_________5_________6_________7_________8"
-    }}</Col>
+      {{
+        "________________1_________2_________3_________4_________5_________6_________7_________8"
+      }}</Col
+    >
     <Col span="18">
-    {{
-      "_______12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-    }}</Col>
+      {{
+        "_______12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+      }}</Col
+    >
     <Col span="18"> {{ "__INDEX" }}{{ selectedBar }} </Col>
     <Col span="6">
-    <Select v-model="selectedBarModel" style="width: 250px" size="small">
-      <i-Option v-for="item in FORM_TYPE_BAR_LIST" :value="item.value" :key="item.value">
-        <span>{{ item.label }}</span>
-        <span style="float: right; color: #ccc">{{ item.value }}</span>
-      </i-Option>
-    </Select>
+      <Select v-model="selectedBarModel" style="width: 250px" size="small">
+        <i-Option
+          v-for="item in FORM_TYPE_BAR_LIST"
+          :value="item.value"
+          :key="item.value"
+        >
+          <span>{{ item.label }}</span>
+          <span style="float: right; color: #ccc">{{ item.value }}</span>
+        </i-Option>
+      </Select>
     </Col>
   </Row>
 
   <div class="text-block0">
     <div class="container">
       <div class="cont_elements">
-        <div v-for="(parsedLine, index) in parsedRpgFile" :class="getElementClass(index)" :ref="(el) => {
-            divs[index] = el;
-          }
-          " @click="onElementClicked(parsedLine, index)">
+        <div
+          v-for="(parsedLine, index) in parsedRpgFile"
+          :class="getElementClass(index)"
+          :ref="
+            (el) => {
+              divs[index] = el;
+            }
+          "
+          @click="onElementClicked(parsedLine, index)"
+        >
           <!-- {{ rl.rawRl }} -->
           <Poptip :title="'title'" width="500">
             <template #content> {{ parsedLine }}</template>
@@ -114,13 +121,20 @@ function scrollToRef(position: Position, preIndex: number) {
           </Poptip>
           <!-- 整行註解 -->
           <span v-if="parsedLine.formType === 'comments'" class="comments">
-            {{ parsedLine.rawRl }}</span>
+            {{ parsedLine.rawRl }}</span
+          >
           <span v-else>
-            <FileLine :parsed-line="parsedLine" :fieldInfoList="fieldInfoList" @scroll-to-ref="scrollToRef" />
+            <FileLine
+              :parsed-line="parsedLine"
+              :fieldInfoList="fieldInfoList"
+              @scroll-to-ref="scrollToRef"
+            />
             <span v-if="parsedLine.formType === 'unknown'" class="non">
-              {{ parsedLine.rawRl }}</span>
+              {{ parsedLine.rawRl }}</span
+            >
             <span v-if="parsedLine.formType === 'unknown2'" class="non2">
-              {{ parsedLine.rawRl }}</span>
+              {{ parsedLine.rawRl }}</span
+            >
           </span>
         </div>
       </div>
@@ -134,11 +148,8 @@ function scrollToRef(position: Position, preIndex: number) {
   /* position: relative; */
   background-color: rgb(0, 0, 0);
   color: rgb(255, 255, 255);
-  height: 400px;
+  height: 75vh;
   width: 100%;
-  /* position: absolute;
-      width: 100%;
-      left: 5%; */
 }
 
 .container {
