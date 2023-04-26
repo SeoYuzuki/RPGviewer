@@ -5,7 +5,6 @@ import { onMounted, onUnmounted } from "vue";
  * 十字線事件，包含監聽鍵盤事件
  */
 export default function () {
-    console.log("auxiliaryCross");
     // 十字線
     let ox = document.createElement('div');
     let oy = document.createElement('div');

@@ -3,11 +3,13 @@ thx
 
 DOING
 1. 加強A卡分析
+2. 整理調整後用不到東西，並提出上傳區塊
+3. F卡 rename連結
 
 BUG
 1. A卡判斷連續行 
-2. 左右鍵導向    fix?
-3. keywordField Poptip 沒reactive  fixed
+2. 左右鍵導向    !!
+
 
 TODO 
 1. formType O

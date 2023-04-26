@@ -13,7 +13,7 @@ const emit = defineEmits<{
 
 const targetFieldInfo = computed(() => {
   return props.fieldInfoList.find(
-    (e: any) => e.fieldName.trim() === props.fieldText.trim().split(",")[0]
+    (e: any) => e.fieldName?.trim() === props.fieldText.trim().split(",")[0]
   );
 });
 
@@ -54,7 +54,7 @@ function getStaticFieldClass() {
 }
 
 function onClick(e: MouseEvent) {
-  console.log(props, targetFieldInfo);
+  console.log(props, targetFieldInfo.value);
   if (e.ctrlKey) {
     if (targetFieldInfo.value?.info.openDss) {
       // emit("openDds", targetFieldInfo.value?.info.openDss);
@@ -93,7 +93,7 @@ function onClick(e: MouseEvent) {
       </template>
     </Poptip>
     <template v-else>
-      <span :class="getStaticFieldClass()">
+      <span :class="getStaticFieldClass()" @click="onClick">
         {{ fieldText }}
       </span>
     </template>

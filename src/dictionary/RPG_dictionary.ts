@@ -14,6 +14,8 @@ interface KeywordsDic {
     readonly Data_Type_Dic: Dic[];
     readonly File_Designation_Dic: Dic[];
     readonly Data_Type_And_Keyboard_Shift: Dic[];
+    /** https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh38.html#HDRF15 */
+    readonly File_Type_Dic: Dic[];
 }
 
 /**
@@ -193,6 +195,32 @@ const Data_Type_And_Keyboard_Shift: Dic[] = [
     { keyword: "Z", title: "Timestamp", content: "", website: "https://www.ibm.com/docs/en/i/7.1?topic=35-valid-entries-display-files" },
 ];
 
+const File_Type_Dic: Dic[] = [
+    {
+        keyword: "I",
+        title: "Input Files",
+        content: "An input file is one from which a program reads information. It can contain data records, arrays, or tables, or it can be a record-address file.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh38.html#HDRF15"
+    },
+    {
+        keyword: "O",
+        title: "Output Files",
+        content: "An output file is a file to which information is written.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh38.html#HDRF15"
+    },
+    {
+        keyword: "U",
+        title: "Update Files",
+        content: "An update file is an input file whose records can be updated. Updating alters the data in one or more fields of any record contained in the file and writes that record back to the same file from which it was read. If records are to be deleted, the file must be specified as an update file.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh38.html#HDRF15"
+    },
+    {
+        keyword: "C",
+        title: "Combined Files",
+        content: "A combined file is both an input file and an output file. When a combined file is processed, the output record contains only the data represented by the fields in the output record. This differs from an update file, where the output record contains the input record modified by the fields in the output record.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh38.html#HDRF15"
+    },
+]
 
 /**
  * 
@@ -282,7 +310,8 @@ const Keywords_Dic: KeywordsDic = {
     Record_Identifying_Indicator_Dic: Record_Identifying_Indicator_Dic,
     Data_Type_Dic: Data_Type_Dic,
     File_Designation_Dic: File_Designation_Dic,
-    Data_Type_And_Keyboard_Shift: Data_Type_And_Keyboard_Shift
+    Data_Type_And_Keyboard_Shift: Data_Type_And_Keyboard_Shift,
+    File_Type_Dic: File_Type_Dic
 }
 
 export type { KeywordsDic, FormTypeBar, Dic };

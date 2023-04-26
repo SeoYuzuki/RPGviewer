@@ -46,7 +46,12 @@ function parseFieldDescriptionEntries_J(rl: string): Map<string, RPGContent> {
     contentMap.set('Form Type', { value: ezCut(6, 6), view: "KeywordField", dic: "Form_Type_Dic" });
     contentMap.set('Reserved?', { value: ezCut(7, 42) });
     contentMap.set('Data Format', { value: ezCut(43, 43) });
-    contentMap.set('Field Location', { value: ezCut(44, 51) });
+    if (/^\d+$/.test(ezCut(44, 47).trim()) && /^\d+$/.test(ezCut(48, 51).trim())) {
+        contentMap.set('Field Location1', { value: ezCut(44, 47), view: "ParameterField" });
+        contentMap.set('Field Location2', { value: ezCut(48, 51), view: "ParameterField" });
+    } else {
+        contentMap.set('Field Location', { value: ezCut(44, 51) });
+    }
     contentMap.set('Decimal Positions', { value: ezCut(52, 52) });
     contentMap.set('Field Name', { value: ezCut(53, 58), view: "ParameterField" });
     contentMap.set('Control Level', { value: ezCut(59, 60) });
@@ -148,7 +153,12 @@ function parseDataStructureSubfieldSpecifications(rl: string): Map<string, RPGCo
         contentMap.set('Reserved2', { value: ezCut(9, 20) });
         contentMap.set('Initialization Value', { value: ezCut(21, 42), view: "ParameterField" });
         contentMap.set('Internal Data Format', { value: ezCut(43, 43) });
-        contentMap.set('Field Location', { value: ezCut(44, 51) });
+        if (/^\d+$/.test(ezCut(44, 47).trim()) && /^\d+$/.test(ezCut(48, 51).trim())) {
+            contentMap.set('Field Location1', { value: ezCut(44, 47), view: "ParameterField" });
+            contentMap.set('Field Location2', { value: ezCut(48, 51), view: "ParameterField" });
+        } else {
+            contentMap.set('Field Location', { value: ezCut(44, 51) });
+        }
         contentMap.set('Decimal Positions', { value: ezCut(52, 52) });
         contentMap.set('Field Name', { value: ezCut(53, 58), view: "ParameterField" });
         contentMap.set('Reserved4', { value: ezCut(59, 74) });
@@ -162,7 +172,12 @@ function parseDataStructureSubfieldSpecifications(rl: string): Map<string, RPGCo
         contentMap.set('External Field Name', { value: ezCut(21, 30) });// 21~42 = Initialization Value, if pos 8 = 'I'
         contentMap.set('Reserved3', { value: ezCut(31, 42) }); // 
         contentMap.set('Internal Data Format', { value: ezCut(43, 43) });
-        contentMap.set('Field Location', { value: ezCut(44, 51) });
+        if (/^\d+$/.test(ezCut(44, 47).trim()) && /^\d+$/.test(ezCut(48, 51).trim())) {
+            contentMap.set('Field Location1', { value: ezCut(44, 47), view: "ParameterField" });
+            contentMap.set('Field Location2', { value: ezCut(48, 51), view: "ParameterField" });
+        } else {
+            contentMap.set('Field Location', { value: ezCut(44, 51) });
+        }
         contentMap.set('Decimal Positions', { value: ezCut(52, 52) });
         contentMap.set('Field Name', { value: ezCut(53, 58), view: "ParameterField" });
         contentMap.set('Reserved4', { value: ezCut(59, 74) });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import { Button } from "view-ui-plus";
 
 import { getContentByFile } from "../utils/A1Utils";
@@ -7,13 +7,12 @@ import AuxiliaryCross from "../utils/AuxiliaryCross";
 import { parseFile } from "../core/fileParse/fileParser";
 import { linkMap, publicFieldInfoMap } from "../core/FieldInfoParser";
 import { FileInfo, ParsedLine } from "../types/parsedRpgFile";
-import { FORM_TYPE_BAR_LIST } from "../dictionary/RPG_dictionary";
 import { FieldInfo, Position } from "../types/FieldInfo";
 /** components */
-import FileLine from "./lines/FileLine.vue";
 import DssDrawer from "./DssDrawer.vue";
 import ReadMe from "./ReadMe.vue";
 import JumpLine from "./JumpLine.vue";
+import CodeView from "./CodeView.vue";
 
 /** 十字線事件 */
 let openAuxiliaryCross = AuxiliaryCross().openAuxiliaryCross;
@@ -29,36 +28,6 @@ const tabList = ref<FileInfo[]>([]);
 
 /** 當前Tab名稱 */
 const targetTabName = ref<string>("");
-/** 當前渲染程式碼 */
-const parsedRpgFile = ref<ParsedLine[]>();
-/** 該文件之欄位資訊 */
-const targetFieldInfoList = ref<FieldInfo[]>([]);
-/**
- * 當tab文件切換時
- */
-watch(targetTabName, (val, oldVa) => {
-  parsedRpgFile.value = fileInfoMap.value.get(val)?.parsedLineList;
-  let temp = publicFieldInfoMap.value.get(val);
-  console.log("fieldInfoList", temp);
-  if (temp) {
-    console.log("fieldInfoList", temp);
-    targetFieldInfoList.value = temp;
-  }
-});
-
-/** 欄位資訊清單 target + linkMap */
-const fieldInfoList = computed(() => {
-  let temp: FieldInfo[] = [];
-  let linkList = linkMap.value.get(targetTabName.value);
-  linkList?.forEach((e) => {
-    let fieldInfo = publicFieldInfoMap.value.get(e);
-    if (fieldInfo) {
-      temp = temp.concat(fieldInfo);
-    }
-  });
-
-  return targetFieldInfoList.value.concat(temp);
-});
 
 /**
  * 上傳檔案事件
@@ -96,38 +65,13 @@ let isShowReadMe = ref<boolean>(false);
 /** 是否顯示跳行 */
 let isShowJumpLine = ref<boolean>(false);
 
-let lineClicked = ref<number>(0);
-let selectedBarModel = ref<string>();
-
-function getElementClass(index: number) {
-  if (index == lineClicked.value) {
-    return "focus-line";
-  } else return "element";
-}
-
-function onElementClicked(rl: ParsedLine, index: number) {
-  console.log(rl.formTypeSpecifications, index, rl);
-  lineClicked.value = index;
-  if (rl.formTypeSpecifications) {
-    selectedBarModel.value = rl.formTypeSpecifications;
-  }
-}
-const selectedBar = computed(() => {
-  if (selectedBarModel.value) {
-    //console.log(selectedBarModel.value);
-    return (
-      FORM_TYPE_BAR_LIST.find((e) => e.value === selectedBarModel.value)?.bar ??
-      ""
-    );
-  }
-  return "";
-});
-
 /** 位置紀錄指標 */
 let positionHistIndex = ref<number>(1);
 /** 位置紀錄清單 */
 let positionHistList = ref<Position[]>([]);
 function scrollToRef(position: Position, preIndex: number) {
+  console.log(123, position, preIndex);
+
   positionHistList.value = positionHistList.value.slice(
     0,
     positionHistIndex.value - 1
@@ -141,15 +85,22 @@ function scrollToRef(position: Position, preIndex: number) {
   toPosition();
 }
 
-const divs = ref<any[]>([]);
+/**
+ * 跳轉到行的資訊物件
+ * 有點彆扭的實作，每tab去監聽此物件是否被更新，如果當前tab是自己，則移動到該行
+ */
+const toPositionObj = ref<{ targetTabName: string; index: number }>({
+  targetTabName: "",
+  index: 0,
+});
 function toPosition() {
   let position = positionHistList.value[positionHistIndex.value - 1];
   openTab(position.fileName);
 
-  let el: Element = divs.value[position.index];
-  if (el) {
-    el.scrollIntoView();
-  }
+  toPositionObj.value = {
+    targetTabName: targetTabName.value,
+    index: position.index,
+  };
 }
 
 /**
@@ -187,7 +138,7 @@ onMounted(() => {
       }
       if (e.key === "i") {
         console.log({
-          fieldInfoList: fieldInfoList.value,
+          // fieldInfoList: fieldInfoList.value,
           publicFieldInfoMap: publicFieldInfoMap.value,
           linkMap: linkMap.value,
         });
@@ -252,6 +203,7 @@ function handleTabRemove(name: string) {
     type="card"
     closable
     :draggable="true"
+    :animated="false"
     @on-drag-drop="handleDragDrop"
     @on-tab-remove="handleTabRemove"
   >
@@ -261,74 +213,16 @@ function handleTabRemove(name: string) {
       :label="fileInfo.fileRawName"
       :name="fileInfo.fileName"
     >
+      <CodeView
+        :fileInfoMap="fileInfoMap"
+        :targetTabName="fileInfo.fileName"
+        :to-position-obj="toPositionObj"
+        @scrollToRef="scrollToRef"
+      >
+      </CodeView>
     </TabPane>
   </Tabs>
-  <Row :gutter="0">
-    <Col span="18">
-      {{
-        "________________1_________2_________3_________4_________5_________6_________7_________8"
-      }}</Col
-    >
-    <Col span="18">
-      {{
-        "_______12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-      }}</Col
-    >
-    <Col span="18"> {{ "__INDEX" }}{{ selectedBar }} </Col>
-    <Col span="6">
-      <Select v-model="selectedBarModel" style="width: 250px" size="small">
-        <i-Option
-          v-for="item in FORM_TYPE_BAR_LIST"
-          :value="item.value"
-          :key="item.value"
-        >
-          <span>{{ item.label }}</span>
-          <span style="float: right; color: #ccc">{{ item.value }}</span>
-        </i-Option>
-      </Select>
-    </Col>
-  </Row>
 
-  <div class="text-block0">
-    <div class="container">
-      <div class="cont_elements">
-        <div
-          v-for="(parsedLine, index) in parsedRpgFile"
-          :class="getElementClass(index)"
-          :ref="
-            (el) => {
-              divs[index] = el;
-            }
-          "
-          @click="onElementClicked(parsedLine, index)"
-        >
-          <!-- {{ rl.rawRl }} -->
-          <Poptip :title="'title'" width="500">
-            <template #content> {{ parsedLine }}</template>
-
-            {{ " " + (index + 1).toString().padStart(5, "0") }}
-          </Poptip>
-          <!-- 整行註解 -->
-          <span v-if="parsedLine.formType === 'comments'" class="comments">
-            {{ parsedLine.rawRl }}</span
-          >
-          <span v-else>
-            <FileLine
-              :parsed-line="parsedLine"
-              :fieldInfoList="fieldInfoList"
-              @scroll-to-ref="scrollToRef"
-            />
-            <span v-if="parsedLine.formType === 'unknown'" class="non">
-              {{ parsedLine.rawRl }}</span
-            >
-            <span v-if="parsedLine.formType === 'unknown2'" class="non2">
-              {{ parsedLine.rawRl }}</span
-            >
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
   <ReadMe v-model:isShowReadMe="isShowReadMe" />
   <JumpLine
     v-model:is-show="isShowJumpLine"
@@ -338,64 +232,6 @@ function handleTabRemove(name: string) {
 </template>
 
 <style scoped>
-.text-block0 {
-  position: absolute;
-  background-color: rgb(0, 0, 0);
-  color: rgb(255, 255, 255);
-  height: 80%;
-  width: 100%;
-  /* position: absolute;
-      width: 100%;
-      left: 5%; */
-}
-
-.text-block1 {
-  background-color: rgb(42, 42, 42);
-  color: rgb(255, 255, 255);
-  /* height: 500px; */
-  /* width: 700px; */
-  font-family: "MingLiU";
-  /* position: absolute;
-      width: 100%;
-      left: 5%; */
-}
-
-.text-block {
-  white-space: pre-wrap;
-  /* font-size: v-bind("fontSize"); */
-  /* display: inline-block;
-        /* max-width: 200px; */
-  /* height: 100%; */
-  /* position: absolute; */
-  /* top: 50%; */
-  /* display: flex; */
-  /* justify-content: center; */
-  /* align-items: center; */
-}
-
-.bar {
-  background-color: rgb(75, 16, 16);
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-.container {
-  white-space: pre-wrap;
-  position: relative;
-  height: 100%;
-}
-
-.cont_elements {
-  overflow-y: scroll;
-  height: 100%;
-}
-
-.element {
-  /* font-family: MingLiU; */
-  position: relative;
-}
-
 .comments {
   color: #3ba000;
 }
