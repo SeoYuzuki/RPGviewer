@@ -1,5 +1,5 @@
 import { RPGContent } from "../../types/parsedRpgFile";
-import { isBlank, isNotBlank, substr_by_bytes } from "../../utils/StringUtils"
+import { ezCutUtil, isBlank, isNotBlank, substr_by_bytes } from "../../utils/StringUtils"
 
 /** parse Calculation Specification
  * 
@@ -24,26 +24,28 @@ import { isBlank, isNotBlank, substr_by_bytes } from "../../utils/StringUtils"
  * @param rl 原始行字串
  */
 function parseCalculationSpecification(rl: string): Map<string, RPGContent> {
+    let ezCut = ezCutUtil(rl);
     let contentMap: Map<string, RPGContent> = new Map();
-    contentMap.set('HEAD_COMMENT', { value: substr_by_bytes(rl, 0, 5), class: "comments" });
-    contentMap.set('Form_Type', { value: substr_by_bytes(rl, 5, 1), view: "KeywordField", dic: "Form_Type_Dic" });
-    contentMap.set('Control_Level_Indicators', { value: substr_by_bytes(rl, 6, 2) });
-    contentMap.set('N01', { value: substr_by_bytes(rl, 8, 3) });
-    contentMap.set('N02', { value: substr_by_bytes(rl, 11, 3) });
-    contentMap.set('N03', { value: substr_by_bytes(rl, 14, 3) });
-    contentMap.set('Factor1', { value: substr_by_bytes(rl, 17, 7), view: "ParameterField" });
-    contentMap.set('Reserved1', { value: substr_by_bytes(rl, 24, 3) });
-    contentMap.set('Opcde', { value: substr_by_bytes(rl, 27, 5), view: "KeywordField", dic: "Opcde_Dic", class: "opcde" });
-    contentMap.set('Factor2', { value: substr_by_bytes(rl, 32, 7), view: "ParameterField" });
-    contentMap.set('Reserved2', { value: substr_by_bytes(rl, 39, 3) });
-    contentMap.set('Result_Field', { value: substr_by_bytes(rl, 42, 6), view: "ParameterField" });
-    contentMap.set('Field_Length', { value: substr_by_bytes(rl, 48, 3) });
-    contentMap.set('Decimal_Positions', { value: substr_by_bytes(rl, 51, 1) });
-    contentMap.set('Operation_Extender', { value: substr_by_bytes(rl, 52, 1) });
-    contentMap.set('Resulting_Indicators_Hi', { value: substr_by_bytes(rl, 53, 2) });
-    contentMap.set('Resulting_Indicators_Lo', { value: substr_by_bytes(rl, 55, 2) });
-    contentMap.set('Resulting_Indicators_Eq', { value: substr_by_bytes(rl, 57, 2) });
-    contentMap.set('Comments', { value: substr_by_bytes(rl, 59, 20), class: "comments" });
+    contentMap.set('HEAD_COMMENT', { value: ezCut(1, 5), class: "comments" });
+    contentMap.set('Form_Type', { value: ezCut(6, 6), view: "KeywordField", dic: "Form_Type_Dic" });
+    contentMap.set('Control_Level_Indicators', { value: ezCut(7, 8) });
+    contentMap.set('N01', { value: ezCut(9, 11) });
+    contentMap.set('N02', { value: ezCut(12, 14) });
+    contentMap.set('N03', { value: ezCut(15, 17) });
+    contentMap.set('Factor1', { value: ezCut(18, 27), view: "ParameterField" });
+    // contentMap.set('Reserved1', { value: substr_by_bytes(rl, 24, 3) });
+    contentMap.set('Opcde', { value: ezCut(28, 32), view: "KeywordField", dic: "Opcde_Dic", class: "opcde" });
+    contentMap.set('Factor2', { value: ezCut(33, 42), view: "ParameterField" });
+    // contentMap.set('Reserved2', { value: substr_by_bytes(rl, 39, 3) });
+    contentMap.set('Result_Field', { value: ezCut(43, 48), view: "ParameterField" });
+    contentMap.set('Field_Length', { value: ezCut(49, 51) });
+    contentMap.set('Decimal_Positions', { value: ezCut(52, 52) });
+    contentMap.set('Operation_Extender', { value: ezCut(53, 53) });
+    contentMap.set('Resulting_Indicators_Hi', { value: ezCut(54, 55) });
+    contentMap.set('Resulting_Indicators_Lo', { value: ezCut(56, 57) });
+    contentMap.set('Resulting_Indicators_Eq', { value: ezCut(58, 59) });
+    contentMap.set('Comments1', { value: ezCut(60, 74), class: "comments" });
+    contentMap.set('Comments2', { value: ezCut(75, 80), class: "comments" });
 
     return contentMap;
 }

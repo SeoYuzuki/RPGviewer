@@ -13,7 +13,7 @@ const emit = defineEmits<{
 
 const targetFieldInfo = computed(() => {
   return props.fieldInfoList.find(
-    (e: any) => e.fieldName.trim() === props.fieldText.trim().split(",")[0]
+    (e: any) => e.fieldName?.trim() === props.fieldText.trim().split(",")[0]
   );
 });
 
@@ -78,7 +78,13 @@ function onClick(e: MouseEvent) {
 
 <template>
   <span>
-    <Poptip v-if="targetFieldInfo" class="poptip" width="300" word-wrap transfer>
+    <Poptip
+      v-if="targetFieldInfo"
+      class="poptip"
+      width="300"
+      word-wrap
+      transfer
+    >
       <span :class="clickableFieldClass" @click="onClick">
         {{ fieldText }}
       </span>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import { Button } from "view-ui-plus";
 
 import { getContentByFile } from "../utils/A1Utils";
@@ -7,10 +7,8 @@ import AuxiliaryCross from "../utils/AuxiliaryCross";
 import { parseFile } from "../core/fileParse/fileParser";
 import { linkMap, publicFieldInfoMap } from "../core/FieldInfoParser";
 import { FileInfo, ParsedLine } from "../types/parsedRpgFile";
-import { FORM_TYPE_BAR_LIST } from "../dictionary/RPG_dictionary";
 import { FieldInfo, Position } from "../types/FieldInfo";
 /** components */
-import FileLine from "./lines/FileLine.vue";
 import DssDrawer from "./DssDrawer.vue";
 import ReadMe from "./ReadMe.vue";
 import JumpLine from "./JumpLine.vue";
@@ -72,6 +70,8 @@ let positionHistIndex = ref<number>(1);
 /** 位置紀錄清單 */
 let positionHistList = ref<Position[]>([]);
 function scrollToRef(position: Position, preIndex: number) {
+  console.log(123, position, preIndex);
+
   positionHistList.value = positionHistList.value.slice(
     0,
     positionHistIndex.value - 1
@@ -85,15 +85,22 @@ function scrollToRef(position: Position, preIndex: number) {
   toPosition();
 }
 
-const divs = ref<any[]>([]);
+/**
+ * 跳轉到行的資訊物件
+ * 有點彆扭的實作，每tab去監聽此物件是否被更新，如果當前tab是自己，則移動到該行
+ */
+const toPositionObj = ref<{ targetTabName: string; index: number }>({
+  targetTabName: "",
+  index: 0,
+});
 function toPosition() {
   let position = positionHistList.value[positionHistIndex.value - 1];
   openTab(position.fileName);
 
-  let el: Element = divs.value[position.index];
-  if (el) {
-    el.scrollIntoView();
-  }
+  toPositionObj.value = {
+    targetTabName: targetTabName.value,
+    index: position.index,
+  };
 }
 
 /**
@@ -209,6 +216,7 @@ function handleTabRemove(name: string) {
       <CodeView
         :fileInfoMap="fileInfoMap"
         :targetTabName="fileInfo.fileName"
+        :to-position-obj="toPositionObj"
         @scrollToRef="scrollToRef"
       >
       </CodeView>

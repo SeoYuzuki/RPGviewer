@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { FieldInfo, Position } from "../types/FieldInfo";
 import { FileInfo, ParsedLine } from "../types/parsedRpgFile";
 import { linkMap, publicFieldInfoMap } from "../core/FieldInfoParser";
@@ -12,12 +12,15 @@ const props = defineProps<{
   targetTabName: string;
   /** 上傳的檔案列表 */
   fileInfoMap: Map<string, FileInfo>;
+  /** 跳轉到行的資訊物件 */
+  toPositionObj: { targetTabName: string; index: number };
 }>();
 
 const emit = defineEmits<{
   (e: "scrollToRef", position: Position, preIndex: number): void;
 }>();
 
+/** 每行的element */
 const divs = ref<any[]>([]);
 
 let lineClicked = ref<number>(0);
@@ -68,6 +71,22 @@ const selectedBar = computed(() => {
   return "";
 });
 
+/**
+ * 跳轉到行
+ * 有點彆扭的實作，每tab去監聽此物件是否被更新，如果當前tab是自己，則移動到該行
+ */
+watch(
+  () => props.toPositionObj,
+  (nV, oV) => {
+    if (nV.targetTabName === props.targetTabName) {
+      let el: Element = divs.value[nV.index];
+      if (el) {
+        el.scrollIntoView();
+      }
+    }
+  }
+);
+
 function scrollToRef(position: Position, preIndex: number) {
   emit("scrollToRef", position, preIndex);
 }
@@ -113,7 +132,6 @@ function scrollToRef(position: Position, preIndex: number) {
           "
           @click="onElementClicked(parsedLine, index)"
         >
-          <!-- {{ rl.rawRl }} -->
           <Poptip :title="'title'" width="500">
             <template #content> {{ parsedLine }}</template>
 
