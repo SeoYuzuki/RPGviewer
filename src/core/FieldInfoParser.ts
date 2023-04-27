@@ -272,27 +272,66 @@ const saveFieldInfoList_A = function (parsedRpgFile: ParsedLine[], fileName: str
                 fileName: fileName,
                 index: rl.index
             };
-            if (map.get("Type of Name")?.value === 'R') {
-                fieldInfoList.push({
-                    position: position,
-                    fieldName: map.get("Name")?.value,
-                    info: {
-                        content: "Record",
-                        class: "record",
-                        title: "",
+            if (rl.formTypeSpecifications === "Physical_And_logical_Files") {
+                if (map.get("Type of Name")?.value === 'R') {
+                    let s = "";
+                    if (rl.contentMap.get('DDS keyword function name')?.value === "TEXT") {
+                        s = rl.contentMap.get('DDS keyword para')?.value ?? "";
                     }
-                });
-            } else if (map.get("Type of Name")?.value === ' ') {
-                // TODO 排除 連續LINE
-                fieldInfoList.push({
-                    position: position,
-                    fieldName: map.get("Name")?.value,
-                    info: {
-                        content: "Field from " + fileName + ", length of " + map.get("Length")?.value + ',' + map.get("Decimal positions")?.value,
-                        title: "",
+                    for (let k = 1; ; k++) {
+                        let temp_rl = noCommentsRpg[count + k];
+                        if (temp_rl.formTypeSpecifications === "Physical_And_logical_Files_FunctionsLine") {
+                            if (temp_rl.contentMap.get('DDS keyword function name')?.value === "TEXT") {
+                                s = temp_rl.contentMap.get('DDS keyword para')?.value ?? "";
+                            }
+                        } else {
+                            break;
+                        }
                     }
-                });
+
+                    s = s.replaceAll("'", "");
+                    fieldInfoList.push({
+                        position: position,
+                        fieldName: map.get("Name")?.value,
+                        info: {
+                            content: "Record",
+                            class: "record",
+                            title: s,
+                        }
+                    });
+                } else if (map.get("Type of Name")?.value === ' ') {
+                    let s = "";
+                    if (rl.contentMap.get('DDS keyword function name')?.value === "TEXT") {
+                        s = rl.contentMap.get('DDS keyword para')?.value ?? "";
+                    }
+                    for (let k = 1; ; k++) {
+                        let temp_rl = noCommentsRpg[count + k];
+                        if (temp_rl.formTypeSpecifications === "Physical_And_logical_Files_FunctionsLine") {
+                            if (temp_rl.contentMap.get('DDS keyword function name')?.value === "TEXT") {
+                                s = temp_rl.contentMap.get('DDS keyword para')?.value ?? "";
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+
+                    s = s.replaceAll("'", "");
+
+                    fieldInfoList.push({
+                        position: position,
+                        fieldName: map.get("Name")?.value,
+                        info: {
+                            content: "Field from " + fileName
+                                + ", length of " + map.get("Length")?.value.trim()
+                                + ',' + map.get("Decimal positions")?.value.trim(),
+                            title: s,
+                        }
+                    });
+                }
+            } else if (rl.formTypeSpecifications === "Physical_And_logical_Files_FunctionsLine") {
+
             }
+
         }
     }
 

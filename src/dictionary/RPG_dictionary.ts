@@ -316,6 +316,12 @@ const FORM_TYPE_BAR_LIST: FormTypeBar[] = [
         bar: ".....A..........T.Name++++++RLen++TDpB......Functions++++++++++++++++++"
     },
     {
+        value: 'Physical_And_logical_Files_FunctionsLine',
+        label: 'A',
+        tag: 'PF',
+        bar: ".....A..........T.Name++++++RLen++TDpB......Functions++++++++++++++++++"
+    },
+    {
         value: 'LF',
         label: 'A',
         tag: 'LF',

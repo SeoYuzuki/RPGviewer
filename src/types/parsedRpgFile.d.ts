@@ -8,6 +8,7 @@ class ParsedLine {
     index: number;
     rawRl: string;
     formType: FormType;
+    /** 該行的欄位MAP */
     contentMap: Map<string, RPGContent>;
     formTypeSpecifications?: string;
     formContent?: any

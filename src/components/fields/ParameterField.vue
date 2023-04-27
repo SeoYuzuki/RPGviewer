@@ -71,6 +71,7 @@ function onClick(e: MouseEvent) {
       v-if="targetFieldInfo"
       class="poptip"
       width="300"
+      :title="targetFieldInfo.info.title"
       word-wrap
       transfer
     >

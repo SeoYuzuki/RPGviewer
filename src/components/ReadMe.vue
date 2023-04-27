@@ -18,7 +18,7 @@ function onVisibleChange(event: boolean) {
     @on-visible-change="onVisibleChange"
   >
     <Row :gutter="16">
-      <Col span="24"> 目前主要支援A F E I C 規格 </Col>
+      <Col span="24"> 目前主要支援A H F E I C 規格 </Col>
     </Row>
     <Row :gutter="16">
       <Col span="8">左鍵有顏色之關鍵字:</Col>
@@ -33,16 +33,12 @@ function onVisibleChange(event: boolean) {
       <Col span="14"> 跳到在此檔案中定義field的位置 </Col>
     </Row>
     <Row :gutter="16">
-      <Col span="8">alt + 鍵盤左:</Col>
-      <Col span="14"> 回到跳轉之前的位置 </Col>
+      <Col span="8">alt + 鍵盤左/右:</Col>
+      <Col span="14"> 回到跳轉之前/之後的位置 </Col>
     </Row>
     <Row :gutter="16">
       <Col span="8">alt + l:</Col>
       <Col span="14"> 跳至行數 </Col>
-    </Row>
-    <Row :gutter="16">
-      <Col span="8">alt +i:</Col>
-      <Col span="14"> 除錯用 log fieldInfoList </Col>
     </Row>
   </Modal>
 </template>
