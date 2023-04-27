@@ -10,7 +10,6 @@ class FieldInfo {
         title: string,
         /** 該欄位的class */
         class?: string,
-        openDss?: string
     }
 }
 

@@ -16,6 +16,8 @@ interface KeywordsDic {
     readonly Data_Type_And_Keyboard_Shift: Dic[];
     /** https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh38.html#HDRF15 */
     readonly File_Type_Dic: Dic[];
+    /** https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh20.html#HDRPODATFO */
+    readonly Date_Format: Dic[];
 }
 
 /**
@@ -222,6 +224,33 @@ const File_Type_Dic: Dic[] = [
     },
 ]
 
+const Date_Format: Dic[] = [
+    {
+        keyword: " ",
+        title: "Date Format:Blank",
+        content: "Defaults to month/day/year if position 21 is blank. Defaults to day/month/year if position 21 contains a D, I, or J.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh20.html#HDRPODATFO"
+    },
+    {
+        keyword: "M",
+        title: "Date Format:M",
+        content: "Month/day/year.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh20.html#HDRPODATFO"
+    },
+    {
+        keyword: "D",
+        title: "Date Format:D",
+        content: "Day/month/year.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh20.html#HDRPODATFO"
+    },
+    {
+        keyword: "Y",
+        title: "Date Format:Y",
+        content: "Year/month/day.",
+        website: "https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh20.html#HDRPODATFO"
+    },
+]
+
 /**
  * 
  */
@@ -269,13 +298,13 @@ const FORM_TYPE_BAR_LIST: FormTypeBar[] = [
         bar: ".....E....FromfileTofile++Name++N/rN/tbLenPDSArrnamLenPDSComments++++++"
     },
     {
-        value: 'FX',
+        value: 'File_Description',
         label: 'F',
         tag: 'FX',
         bar: ".....FFilenameIPEAF........L..I........Device+......KExit++Entry+A....U"
     },
     {
-        value: 'FC',
+        value: 'Continuation_Lines',
         label: 'F',
         tag: 'FC',
         bar: ".....F............Ext-record..................RcdnbrKOptionEntry+++...."
@@ -311,7 +340,8 @@ const Keywords_Dic: KeywordsDic = {
     Data_Type_Dic: Data_Type_Dic,
     File_Designation_Dic: File_Designation_Dic,
     Data_Type_And_Keyboard_Shift: Data_Type_And_Keyboard_Shift,
-    File_Type_Dic: File_Type_Dic
+    File_Type_Dic: File_Type_Dic,
+    Date_Format: Date_Format
 }
 
 export type { KeywordsDic, FormTypeBar, Dic };

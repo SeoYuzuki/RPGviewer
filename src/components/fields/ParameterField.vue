@@ -54,18 +54,7 @@ function getStaticFieldClass() {
 }
 
 function onClick(e: MouseEvent) {
-  console.log(props, targetFieldInfo.value);
   if (e.ctrlKey) {
-    if (targetFieldInfo.value?.info.openDss) {
-      // emit("openDds", targetFieldInfo.value?.info.openDss);
-      emit(
-        "scrollToRef",
-        { fileName: targetFieldInfo.value?.info.openDss, index: 0 },
-        props.index
-      );
-      return;
-    }
-
     if (targetFieldInfo.value?.position) {
       emit("scrollToRef", targetFieldInfo.value?.position, props.index);
     }

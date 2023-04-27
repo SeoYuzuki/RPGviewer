@@ -28,6 +28,13 @@ const parseDdsFile = function (ddsFile: string): ParsedLine[] {
                     });
                 }
 
+            } else {
+                parsedRpgFile.push({
+                    index: i,
+                    rawRl: rl,
+                    formType: "unknown",
+                    contentMap: new Map()
+                });
             }
         } else {
             // line comments

@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch, nextTick } from "vue";
 import { Button } from "view-ui-plus";
 
-import { getContentByFile } from "../utils/A1Utils";
 import AuxiliaryCross from "../utils/AuxiliaryCross";
-import { parseFile } from "../core/fileParse/fileParser";
-import { linkMap, publicFieldInfoMap } from "../core/FieldInfoParser";
-import { FileInfo, ParsedLine } from "../types/parsedRpgFile";
-import { FieldInfo, Position } from "../types/FieldInfo";
+import { parseFile, fileInfoMap } from "../core/fileParse/fileParser";
+import { FileInfo } from "../types/parsedRpgFile";
+import { Position } from "../types/FieldInfo";
 /** components */
-import DssDrawer from "./DssDrawer.vue";
+import FileDrawer from "./FileDrawer.vue";
 import ReadMe from "./ReadMe.vue";
 import JumpLine from "./JumpLine.vue";
 import CodeView from "./CodeView.vue";
@@ -21,40 +19,23 @@ let openAuxiliaryCross = AuxiliaryCross().openAuxiliaryCross;
  * 上傳
  */
 
-/** 上傳的檔案列表 */
-const fileInfoMap = ref<Map<string, FileInfo>>(new Map());
 /** tab顯示清單 */
 const tabList = ref<FileInfo[]>([]);
-
 /** 當前Tab名稱 */
 const targetTabName = ref<string>("");
+
+watch(fileInfoMap.value, () => {
+  if (targetTabName.value === "") {
+    targetTabName.value =
+      Array.from(fileInfoMap.value.values()).pop()?.fileName ?? "";
+  }
+});
 
 /**
  * 上傳檔案事件
  */
 async function handleUpload(file: File): Promise<boolean> {
-  try {
-    let fileExtension = (/[.]/.exec(file.name) ? file.name.split(".")[1] : "")
-      .trim()
-      .toLowerCase();
-    let name = file.name.split(".")[0].trim();
-    console.log(file, fileExtension);
-    let res = await getContentByFile(file);
-    let fileInfo: FileInfo = {
-      parsedLineList: parseFile(res, name, fileExtension),
-      fileRawName: file.name,
-      fileName: name,
-      fileExtension: fileExtension,
-    };
-    tabList.value = tabList.value.filter((e) => e.fileName !== name);
-    tabList.value.push(fileInfo);
-    fileInfoMap.value.set(file.name.split(".")[0].trim(), fileInfo);
-
-    targetTabName.value = name;
-  } catch (e) {
-    console.log(e);
-  }
-
+  parseFile(file, tabList);
   return false;
 }
 
@@ -70,8 +51,6 @@ let positionHistIndex = ref<number>(1);
 /** 位置紀錄清單 */
 let positionHistList = ref<Position[]>([]);
 function scrollToRef(position: Position, preIndex: number) {
-  console.log(123, position, preIndex);
-
   positionHistList.value = positionHistList.value.slice(
     0,
     positionHistIndex.value - 1
@@ -96,11 +75,14 @@ const toPositionObj = ref<{ targetTabName: string; index: number }>({
 function toPosition() {
   let position = positionHistList.value[positionHistIndex.value - 1];
   openTab(position.fileName);
-
-  toPositionObj.value = {
-    targetTabName: targetTabName.value,
-    index: position.index,
-  };
+  console.log({ position: position });
+  /** 等Tab切換完成後再移動到位置 */
+  nextTick(() => {
+    toPositionObj.value = {
+      targetTabName: targetTabName.value,
+      index: position.index - 1,
+    };
+  });
 }
 
 /**
@@ -137,11 +119,7 @@ onMounted(() => {
         isShowJumpLine.value = !isShowJumpLine.value;
       }
       if (e.key === "i") {
-        console.log({
-          // fieldInfoList: fieldInfoList.value,
-          publicFieldInfoMap: publicFieldInfoMap.value,
-          linkMap: linkMap.value,
-        });
+        console.log("test");
       }
     }
   });
@@ -182,7 +160,7 @@ function handleTabRemove(name: string) {
 
 <template>
   <Drawer title="files" placement="right" :mask="false" v-model="isShowDrawer">
-    <DssDrawer :dssInfoMap="fileInfoMap" @openTab="openTab" />
+    <FileDrawer :dssInfoMap="fileInfoMap" @openTab="openTab" />
   </Drawer>
   <Row :gutter="16">
     <Upload multiple :before-upload="handleUpload">
@@ -231,21 +209,4 @@ function handleTabRemove(name: string) {
   />
 </template>
 
-<style scoped>
-.comments {
-  color: #3ba000;
-}
-
-.non {
-  color: #d9ea79;
-}
-
-.non2 {
-  color: #37f49c;
-}
-
-.focus-line {
-  position: relative;
-  background-color: rgb(27, 27, 27);
-}
-</style>
+<style scoped></style>

@@ -3,8 +3,10 @@ import { ParsedLine, RPGContent } from "../types/parsedRpgFile"
 import { FieldInfo, Position } from "../types/FieldInfo";
 import { ref } from "@vue/reactivity";
 
-
-const publicFieldInfoMap = ref<Map<string, FieldInfo[]>>(new Map());
+/** 全域共用的欄位資訊 例如檔案本身，常數 */
+const publicFieldInfoList = ref<FieldInfo[]>([]);
+/** 所有引入檔案的欄位資訊 例如該檔案裏面定義的欄位 */
+const allFieldInfoMap = ref<Map<string, FieldInfo[]>>(new Map());
 const linkMap = ref<Map<string, string[]>>(new Map());
 
 /**
@@ -14,8 +16,22 @@ const linkMap = ref<Map<string, string[]>>(new Map());
  * @param type 
  */
 const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: string, type: string) {
+    /** 放入自己 */
+    publicFieldInfoList.value.push({
+        position: {
+            fileName: fileName,
+            index: 0
+        },
+        fieldName: fileName,
+        info: {
+            content: "File",
+            title: "",
+        }
+    });
+
     let noCommentsRpg = parsedRpgFile.filter(e => { return e.formType !== 'comments' });
     let fieldInfoList: FieldInfo[] = [];
+    /** 迴圈查找檔案中的定義欄位 */
     for (let count = 0; count < noCommentsRpg.length; count++) {
         try {
             let rl: ParsedLine = noCommentsRpg[count];
@@ -153,7 +169,7 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                         },
                         fieldName: map.get("Field Name")?.value,
                         info: {
-                            content: "Field Name",
+                            content: "Field of data structure",
                             title: "",
                         }
                     });
@@ -201,19 +217,6 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                 let map: Map<String, RPGContent> = rl.contentMap;
                 if (rl.formTypeSpecifications === "File_Description") {
                     if (map.get("File Name")) {
-                        fieldInfoList.push({
-                            position: {
-                                fileName: fileName,
-                                index: rl.index
-                            },
-                            fieldName: map.get("File Name")?.value,
-                            info: {
-                                content: "File Name",
-                                title: "",
-                                openDss: map.get("File Name")?.value
-                            }
-                        });
-
                         if (linkMap.value.get(fileName)) {
                             linkMap.value.get(fileName)?.push(map.get("File Name")?.value.trim() ?? "")
                         } else {
@@ -240,19 +243,33 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
         }
     }
 
-    publicFieldInfoMap.value.set(fileName, fieldInfoList);
+    allFieldInfoMap.value.set(fileName, fieldInfoList);
 }
 
-const saveFieldInfoList_A = function (parsedRpgFile: ParsedLine[], name: string, type: string) {
+const saveFieldInfoList_A = function (parsedRpgFile: ParsedLine[], fileName: string, type: string) {
+    /** 放入自己 */
+    publicFieldInfoList.value.push({
+        position: {
+            fileName: fileName,
+            index: 0
+        },
+        fieldName: fileName,
+        info: {
+            content: "File",
+            title: "",
+        }
+    });
+
     let noCommentsRpg = parsedRpgFile.filter(e => { return e.formType !== 'comments' });
     let fieldInfoList: FieldInfo[] = [];
+    /** 迴圈查找檔案中的定義欄位 */
     for (let count = 0; count < noCommentsRpg.length; count++) {
         let rl: ParsedLine = noCommentsRpg[count];
         // A卡
         if (rl.formType === 'A') {
             let map: Map<String, RPGContent> = rl.contentMap;
             let position: Position = {
-                fileName: name,
+                fileName: fileName,
                 index: rl.index
             };
             if (map.get("Type of Name")?.value === 'R') {
@@ -271,7 +288,7 @@ const saveFieldInfoList_A = function (parsedRpgFile: ParsedLine[], name: string,
                     position: position,
                     fieldName: map.get("Name")?.value,
                     info: {
-                        content: "Field from " + name + ", length of " + map.get("Length")?.value + ',' + map.get("Decimal positions")?.value,
+                        content: "Field from " + fileName + ", length of " + map.get("Length")?.value + ',' + map.get("Decimal positions")?.value,
                         title: "",
                     }
                 });
@@ -279,8 +296,8 @@ const saveFieldInfoList_A = function (parsedRpgFile: ParsedLine[], name: string,
         }
     }
 
-    publicFieldInfoMap.value.set(name, fieldInfoList);
+    allFieldInfoMap.value.set(fileName, fieldInfoList);
 
 }
 
-export { saveFieldInfoList, saveFieldInfoList_A, publicFieldInfoMap, linkMap }
+export { saveFieldInfoList, saveFieldInfoList_A, publicFieldInfoList, allFieldInfoMap, linkMap }

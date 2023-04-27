@@ -34,7 +34,7 @@ function parseCalculationSpecification(rl: string): Map<string, RPGContent> {
     contentMap.set('N03', { value: ezCut(15, 17) });
     contentMap.set('Factor1', { value: ezCut(18, 27), view: "ParameterField" });
     // contentMap.set('Reserved1', { value: substr_by_bytes(rl, 24, 3) });
-    contentMap.set('Opcde', { value: ezCut(28, 32), view: "KeywordField", dic: "Opcde_Dic", class: "opcde" });
+    contentMap.set('Opcde', { value: ezCut(28, 32), view: "KeywordField", dic: "Opcde_Dic", class: "white" });
     contentMap.set('Factor2', { value: ezCut(33, 42), view: "ParameterField" });
     // contentMap.set('Reserved2', { value: substr_by_bytes(rl, 39, 3) });
     contentMap.set('Result_Field', { value: ezCut(43, 48), view: "ParameterField" });
