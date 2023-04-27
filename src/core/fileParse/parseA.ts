@@ -57,7 +57,7 @@ H               Specifies this as a help specification      Display only
     contentMap.set('Decimal positions', { value: ezCut(36, 37) });
     contentMap.set('Usage', { value: ezCut(38, 38) }); // Blank or O , I,B,H,M,P
     contentMap.set('Location', { value: ezCut(39, 44) });
-    contentMap.set('DDS keyword entries', { value: ezCut(45, 80) });
+    handleDDSkeywordWntries(contentMap, ezCut(45, 80));
     return contentMap;
 }
 
@@ -74,10 +74,38 @@ function parseDDS_FunctionsLine(rl: string): Map<string, RPGContent> {
     contentMap.set('HEAD_COMMENT', { value: ezCut(1, 5), class: "comments" });
     contentMap.set('Form Type', { value: ezCut(6, 6), view: "KeywordField", dic: "Form_Type_Dic" });
     contentMap.set('Reserved?', { value: ezCut(7, 44) });
-    contentMap.set('DDS keyword entries', { value: ezCut(45, 80) });
+
+    handleDDSkeywordWntries(contentMap, ezCut(45, 80));
+
     return contentMap;
 }
 
+/**
+ * Keyword entries for physical and logical files (positions 45 through 80)
+ * https://www.ibm.com/docs/en/i/7.1?topic=dplf-keyword-entries-physical-logical-files-positions-45-through-80
+ * @param contentMap 
+ * @param DDSkeywordEntries 
+ */
+function handleDDSkeywordWntries(contentMap: Map<string, RPGContent>, DDSkeywordEntries: string) {
+    let keywordEntries = DDSkeywordEntries.split(/\(|\)/);
+    if (keywordEntries.length >= 3) {
+        contentMap.set('DDS keyword function name', { value: keywordEntries[0] });
+        contentMap.set('DDS keyword upper bracket', { value: "(" });
+        if (keywordEntries[0] === 'PFILE') {
+            /** PFILE (Physical File) keyword—logical files only */
+            contentMap.set('DDS keyword para', { value: keywordEntries[1], view: "ParameterField" });
+        } else if (/^'.*'$/.test(keywordEntries[1])) {
+            /** 固定字串的場合 */
+            contentMap.set('DDS keyword para', { value: keywordEntries[1], view: "ParameterField" });
+        } else {
+            contentMap.set('DDS keyword para', { value: keywordEntries[1] });
+        }
+        contentMap.set('DDS keyword lower bracket', { value: ")" });
+        contentMap.set('DDS keyword remaind', { value: keywordEntries[2] });
+    } else {
+        contentMap.set('DDS keyword entries', { value: DDSkeywordEntries });
+    }
+}
 
 
 export {

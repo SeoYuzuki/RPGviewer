@@ -2,7 +2,7 @@ import { parseRpgFile } from "./RpgFileParser";
 import { parseDdsFile } from "./DDSFileParser";
 import { FileInfo, ParsedLine } from "../../types/parsedRpgFile";
 import { getContentByFile } from "../../utils/A1Utils";
-import { saveFieldInfoList, saveFieldInfoList_A, publicFieldInfoMap } from "../FieldInfoParser"
+import { saveFieldInfoList, saveFieldInfoList_A } from "../FieldInfoParser"
 import { Ref, ref } from "vue";
 
 function getParsedLineList(rawFile: string, name: string, fileExtension: string): ParsedLine[] {
@@ -25,7 +25,7 @@ function getParsedLineList(rawFile: string, name: string, fileExtension: string)
 const fileInfoMap = ref<Map<string, FileInfo>>(new Map());
 
 
-async function parseFile2(file: File, tabList: Ref<FileInfo[]>): Promise<boolean> {
+async function parseFile(file: File, tabList: Ref<FileInfo[]>): Promise<boolean> {
     try {
         let fileExtension = (/[.]/.exec(file.name) ? file.name.split(".")[1] : "")
             .trim()
@@ -50,5 +50,5 @@ async function parseFile2(file: File, tabList: Ref<FileInfo[]>): Promise<boolean
     return false;
 }
 
-export { fileInfoMap, parseFile2 as parseFile }
+export { fileInfoMap, parseFile }
 

@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch, nextTick } from "vue";
 import { Button } from "view-ui-plus";
 
 import AuxiliaryCross from "../utils/AuxiliaryCross";
-import {
-  parseFile as parseFile,
-  fileInfoMap,
-} from "../core/fileParse/fileParser";
-import { linkMap, publicFieldInfoMap } from "../core/FieldInfoParser";
+import { parseFile, fileInfoMap } from "../core/fileParse/fileParser";
 import { FileInfo } from "../types/parsedRpgFile";
 import { Position } from "../types/FieldInfo";
 /** components */
@@ -27,6 +23,13 @@ let openAuxiliaryCross = AuxiliaryCross().openAuxiliaryCross;
 const tabList = ref<FileInfo[]>([]);
 /** 當前Tab名稱 */
 const targetTabName = ref<string>("");
+
+watch(fileInfoMap.value, () => {
+  if (targetTabName.value === "") {
+    targetTabName.value =
+      Array.from(fileInfoMap.value.values()).pop()?.fileName ?? "";
+  }
+});
 
 /**
  * 上傳檔案事件
@@ -72,11 +75,14 @@ const toPositionObj = ref<{ targetTabName: string; index: number }>({
 function toPosition() {
   let position = positionHistList.value[positionHistIndex.value - 1];
   openTab(position.fileName);
-
-  toPositionObj.value = {
-    targetTabName: targetTabName.value,
-    index: position.index,
-  };
+  console.log({ position: position });
+  /** 等Tab切換完成後再移動到位置 */
+  nextTick(() => {
+    toPositionObj.value = {
+      targetTabName: targetTabName.value,
+      index: position.index - 1,
+    };
+  });
 }
 
 /**
@@ -113,11 +119,7 @@ onMounted(() => {
         isShowJumpLine.value = !isShowJumpLine.value;
       }
       if (e.key === "i") {
-        console.log({
-          // fieldInfoList: fieldInfoList.value,
-          publicFieldInfoMap: publicFieldInfoMap.value,
-          linkMap: linkMap.value,
-        });
+        console.log("test");
       }
     }
   });
@@ -207,21 +209,4 @@ function handleTabRemove(name: string) {
   />
 </template>
 
-<style scoped>
-.comments {
-  color: #3ba000;
-}
-
-.non {
-  color: #d9ea79;
-}
-
-.non2 {
-  color: #37f49c;
-}
-
-.focus-line {
-  position: relative;
-  background-color: rgb(27, 27, 27);
-}
-</style>
+<style scoped></style>

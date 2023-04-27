@@ -1,5 +1,6 @@
 import { isBlank, isNotBlank, substr_by_bytes, ezCutUtil } from "../../utils/StringUtils"
 import { ParsedLine, RPGContent } from "../../types/parsedRpgFile"
+import parseControlSpecification from "./parseH"
 import parseExtensionSpecification from "./parseE"
 import parseCalculationSpecification from "./parseC"
 import {
@@ -23,7 +24,16 @@ const parseRpgFile = function (_rpgFile: string): ParsedLine[] {
         let rl = rpgFile[i];
         // C卡
         if (rl[6] !== '*') {
-            if (rl[5] === 'F') {
+            if (rl[5] === 'H') {
+                // Control Specification
+                parsedRpgFile.push({
+                    index: i,
+                    rawRl: rl,
+                    formType: "H",
+                    formTypeSpecifications: "Control_Specification",
+                    contentMap: parseControlSpecification(rl),
+                });
+            } else if (rl[5] === 'F') {
                 let ezCut = ezCutUtil(rl);
                 if (ezCut(53, 53) !== 'K') {
                     parsedRpgFile.push({

@@ -66,6 +66,9 @@ function openUrl() {
 </template>
 
 <style scoped>
+.light-yellow {
+  color: #fffa68;
+}
 .white {
   color: #ffffff;
 }

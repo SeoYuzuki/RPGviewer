@@ -10,7 +10,7 @@ function parseFileDescriptionSpecification(rl: string): Map<string, RPGContent> 
     contentMap.set('HEAD_COMMENT', { value: ezCut(1, 5), class: "comments" });
     contentMap.set('Form Type', { value: ezCut(6, 6), view: "KeywordField", dic: "Form_Type_Dic" });
     contentMap.set('File Name', { value: ezCut(7, 14), view: "ParameterField" });
-    contentMap.set('File Type', { value: ezCut(15, 15), view: "KeywordField", dic: "File_Type_Dic" });
+    contentMap.set('File Type', { value: ezCut(15, 15), view: "KeywordField", dic: "File_Type_Dic", class: "light-yellow" });
     contentMap.set('File Designation', { value: ezCut(16, 16), view: "KeywordField", dic: "File_Designation_Dic" });
     contentMap.set('End of File', { value: ezCut(17, 17) });
     contentMap.set('Sequence', { value: ezCut(18, 18) });
@@ -26,7 +26,7 @@ function parseFileDescriptionSpecification(rl: string): Map<string, RPGContent> 
     contentMap.set('Extension Code', { value: ezCut(39, 39) });
     contentMap.set('Device', { value: ezCut(40, 46) });
     contentMap.set('Reserved2', { value: ezCut(47, 52) });
-    contentMap.set('Continuation Lines', { value: ezCut(53, 53) });
+    contentMap.set('Continuation Lines', { value: ezCut(53, 53), class: "light-yellow" });
     contentMap.set('Routine', { value: ezCut(54, 59) });
     contentMap.set('Reserved3', { value: ezCut(60, 65) });
     contentMap.set('File Addition', { value: ezCut(66, 66) });
@@ -108,7 +108,7 @@ function parseContinuationLines(rl: string): Map<string, RPGContent> {
     contentMap.set('External Name', { value: ezCut(19, 28), view: "ParameterField" });
     contentMap.set('Reserved2', { value: ezCut(29, 46) }); // must Blank
     contentMap.set('Record Number Field', { value: ezCut(47, 52) });
-    contentMap.set('Continuation Lines', { value: ezCut(53, 53) }); // must K
+    contentMap.set('Continuation Lines', { value: ezCut(53, 53), view: "KeywordField", class: "light-yellow" }); // must K
     contentMap.set('Option', { value: ezCut(54, 59) });
     contentMap.set('Option Explanation', { value: ezCut(60, 67), view: "ParameterField" });
     contentMap.set('Reserved3', { value: ezCut(68, 74) }); // must Blank

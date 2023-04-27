@@ -2,7 +2,11 @@
 import { ref, computed, watch } from "vue";
 import { FieldInfo, Position } from "../types/FieldInfo";
 import { FileInfo, ParsedLine } from "../types/parsedRpgFile";
-import { linkMap, publicFieldInfoMap } from "../core/FieldInfoParser";
+import {
+  publicFieldInfoList,
+  linkMap,
+  allFieldInfoMap,
+} from "../core/FieldInfoParser";
 import { FORM_TYPE_BAR_LIST } from "../dictionary/RPG_dictionary";
 
 import FileLine from "./lines/FileLine.vue";
@@ -36,7 +40,7 @@ const fieldInfoList = computed(() => {
   let temp: FieldInfo[] = [];
   let linkList = linkMap.value.get(props.targetTabName);
   linkList?.forEach((e) => {
-    let fieldInfo = publicFieldInfoMap.value.get(e);
+    let fieldInfo = allFieldInfoMap.value.get(e);
     if (fieldInfo) {
       temp = temp.concat(fieldInfo);
     }
@@ -44,8 +48,8 @@ const fieldInfoList = computed(() => {
 
   /** 該文件之欄位資訊 */
   let targetFieldInfoList =
-    publicFieldInfoMap.value.get(props.targetTabName) ?? [];
-  return targetFieldInfoList.concat(temp);
+    allFieldInfoMap.value.get(props.targetTabName) ?? [];
+  return targetFieldInfoList.concat(temp).concat(publicFieldInfoList.value);
 });
 
 function getElementClass(index: number) {
@@ -54,7 +58,12 @@ function getElementClass(index: number) {
   } else return "element";
 }
 function onElementClicked(rl: ParsedLine, index: number) {
-  console.log(rl.formTypeSpecifications, index, rl);
+  console.log({
+    formTypeSpecifications: rl.formTypeSpecifications,
+    index: index,
+    rl: rl,
+    fieldInfoList: fieldInfoList.value,
+  });
   lineClicked.value = index;
   if (rl.formTypeSpecifications) {
     selectedBarModel.value = rl.formTypeSpecifications;
@@ -184,6 +193,14 @@ function scrollToRef(position: Position, preIndex: number) {
 .focus-line {
   position: relative;
   background-color: rgb(27, 27, 27);
+}
+
+.non {
+  color: #d9ea79;
+}
+
+.non2 {
+  color: #37f49c;
 }
 
 .comments {
