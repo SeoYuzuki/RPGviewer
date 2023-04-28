@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, Ref } from "vue";
 import { Constants } from "../../dictionary/RPG_dictionary";
 import { FieldInfo, Position } from "../../types/FieldInfo";
+import { isCtrlPress } from "../../utils/KeyPress";
+import StaticField from "./StaticField.vue";
+
+import { Poptip } from "view-ui-plus";
+
 const props = defineProps<{
   fieldInfoList: FieldInfo[];
   fieldText: string;
@@ -9,10 +14,18 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
   (e: "scrollToRef", position: Position, preIndex: number): void;
+  (e: "popCard", a: { fieldInfoList: FieldInfo[]; preIndex: number }): void;
 }>();
 
+/** 欄位資訊 */
 const targetFieldInfo = computed(() => {
   return props.fieldInfoList.find(
+    (e: any) => e.fieldName?.trim() === props.fieldText.trim().split(",")[0]
+  );
+});
+
+const targetFieldInfoList = computed(() => {
+  return props.fieldInfoList.filter(
     (e: any) => e.fieldName?.trim() === props.fieldText.trim().split(",")[0]
   );
 });
@@ -24,68 +37,56 @@ const clickableFieldClass = computed(() => {
   return "clickable_field";
 });
 
-// function getClickableFieldClass() {}
-
-/**
- * 取得常數欄位的class
- * 直接利用該欄位的字串特性判斷是不是常數
- */
-function getStaticFieldClass() {
-  if (/\'.+\'/.test(props.fieldText.trim())) {
-    return "static_string";
-  }
-
-  if (/X\'.+\'/.test(props.fieldText.trim())) {
-    return "static_string";
-  }
-
-  if (
-    !isNaN(parseFloat(props.fieldText.trim())) &&
-    isFinite(parseFloat(props.fieldText.trim()))
-  ) {
-    return "static_number";
-  }
-
-  if (Constants.includes(props.fieldText.trim())) {
-    return "static_number italic";
-  }
-
-  return "temp";
-}
-
-function onClick(e: MouseEvent) {
-  if (e.ctrlKey) {
-    if (targetFieldInfo.value?.position) {
-      emit("scrollToRef", targetFieldInfo.value?.position, props.index);
+function onClick_ctrl() {
+  if (isCtrlPress.value) {
+    if (targetFieldInfoList.value.length === 1) {
+      let info: FieldInfo = targetFieldInfoList.value[0];
+      if (info.position) {
+        emit("scrollToRef", info.position, props.index);
+      }
+      return;
+    } else {
+      emit("popCard", {
+        fieldInfoList: targetFieldInfoList.value,
+        preIndex: props.index,
+      });
     }
+    visible.value = true;
   }
 }
-// function handleMouseEvent(e: any) {
-//   console.log(targetFieldInfo);
-// }
+
+const visible = ref<boolean>(false);
+const hovered = ref<boolean>(false);
 </script>
 
 <template>
-  <span>
-    <Poptip
-      v-if="targetFieldInfo"
-      class="poptip"
-      width="300"
-      :title="targetFieldInfo.info.title"
-      word-wrap
-      transfer
-    >
-      <span :class="clickableFieldClass" @click="onClick">
-        {{ fieldText }}
-      </span>
-      <template #content>
-        {{ targetFieldInfo.info.content ?? "" }}
+  <span @mouseover="hovered = true" @mouseleave="hovered = false">
+    <!-- 有欄位資訊 -->
+    <template v-if="targetFieldInfo">
+      <!-- 被hover 且 沒按ctrl 則只需要Tooltip-->
+      <template v-if="hovered">
+        <Tooltip :delay="500" width="300" transfer>
+          <span :class="clickableFieldClass" @click="onClick_ctrl()">
+            {{ fieldText }}
+          </span>
+          <template #content>
+            <span v-if="targetFieldInfo.info.title">
+              {{ targetFieldInfo.info.title }}<br />
+            </span>
+            {{ targetFieldInfo.info.content ?? "" }}
+          </template>
+        </Tooltip>
       </template>
-    </Poptip>
+
+      <!-- 沒被hover -->
+      <template v-else>
+        <span :class="clickableFieldClass" @click="onClick_ctrl()">
+          {{ fieldText }}
+        </span>
+      </template>
+    </template>
     <template v-else>
-      <span :class="getStaticFieldClass()" @click="onClick">
-        {{ fieldText }}
-      </span>
+      <StaticField :field-text="fieldText" />
     </template>
   </span>
 </template>
@@ -105,14 +106,6 @@ function onClick(e: MouseEvent) {
 
 .data-structure {
   color: #eb15ab;
-}
-
-.static_string {
-  color: #f0a263e8;
-}
-
-.static_number {
-  color: #97f3c8e8;
 }
 
 .italic {

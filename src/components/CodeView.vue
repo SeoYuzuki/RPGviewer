@@ -22,6 +22,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "scrollToRef", position: Position, preIndex: number): void;
+  (e: "popCard", a: { fieldInfoList: FieldInfo[]; preIndex: number }): void;
 }>();
 
 /** 每行的element */
@@ -135,7 +136,7 @@ function scrollToRef(position: Position, preIndex: number) {
           v-for="(parsedLine, index) in parsedRpgFile"
           :class="getElementClass(index)"
           :ref="
-            (el) => {
+            (el: any) => {
               divs[index] = el;
             }
           "
@@ -155,6 +156,7 @@ function scrollToRef(position: Position, preIndex: number) {
               :parsed-line="parsedLine"
               :fieldInfoList="fieldInfoList"
               @scroll-to-ref="scrollToRef"
+              @popCard="emit('popCard', $event)"
             />
             <span v-if="parsedLine.formType === 'unknown'" class="non">
               {{ parsedLine.rawRl }}</span
