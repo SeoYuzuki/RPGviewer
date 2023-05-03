@@ -15,6 +15,7 @@ import FileDrawer from "./FileDrawer.vue";
 import ReadMe from "./ReadMe.vue";
 import JumpLine from "./JumpLine.vue";
 import CodeView from "./CodeView.vue";
+import { ICodeView } from "../types/ICodeView";
 
 /** 十字線事件 */
 let openAuxiliaryCross = AuxiliaryCross().openAuxiliaryCross;
@@ -74,22 +75,41 @@ function scrollToRef(position: Position, preIndex: number) {
   toPosition(positionHistList.value[positionHistIndex.value - 1]);
 }
 
+/** codeView元件清單 */
+const codeViewList = ref<any>([]);
+
 /**
- * 跳轉到行的資訊物件
- * 有點彆扭的實作，每tab去監聽此物件是否被更新，如果當前tab是自己，則移動到該行
+ * 跳到指定TAB 指定行數
+ * @param position
  */
-const toPositionObj = ref<{ targetTabName: string; index: number }>({
-  targetTabName: "",
-  index: 0,
-});
+
 function toPosition(position: Position) {
+  let codeView: ICodeView | undefined = undefined;
+
+  if (position.fileName == targetTabName.value) {
+    // 用for迴圈查找ref list, 不直接用ref綁定成Map是因為效能
+    for (const temp of codeViewList.value) {
+      if (temp.getName() === position.fileName) {
+        codeView = temp;
+      }
+    }
+    if (codeView) {
+      codeView.scrollByIndex(position.index);
+    }
+
+    return;
+  }
   openTab(position.fileName);
-  /** 等Tab切換完成後再移動到位置 */
+  /** 等Tab切換完成後再移動到位置  */
   nextTick(() => {
-    toPositionObj.value = {
-      targetTabName: targetTabName.value,
-      index: position.index,
-    };
+    for (const temp of codeViewList.value) {
+      if (temp.getName() === position.fileName) {
+        codeView = temp;
+      }
+    }
+    if (codeView) {
+      codeView.scrollByIndex(position.index);
+    }
   });
 }
 
@@ -133,6 +153,10 @@ onMounted(() => {
   });
 });
 
+/**
+ * 切換TAB，若TAB已關閉則開啟
+ * @param key
+ */
 function openTab(key: string) {
   let fileName = key.trim();
   let temp = fileInfoMap.value.get(fileName);
@@ -164,6 +188,9 @@ function handleTabRemove(name: string) {
   tabList.value = tabList.value.filter((e) => e.fileName != name);
 }
 
+/**
+ * 同名提示區
+ */
 const showCard = ref<boolean>(false);
 const cardX = ref<number>();
 const cardY = ref<number>();
@@ -235,9 +262,9 @@ function closePopTip() {
       :name="fileInfo.fileName"
     >
       <CodeView
+        ref="codeViewList"
         :fileInfoMap="fileInfoMap"
         :targetTabName="fileInfo.fileName"
-        :to-position-obj="toPositionObj"
         @scrollToRef="scrollToRef"
         @popCard="popCard"
       >

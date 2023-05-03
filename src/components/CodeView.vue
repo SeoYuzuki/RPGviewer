@@ -10,14 +10,13 @@ import {
 import { FORM_TYPE_BAR_LIST } from "../dictionary/RPG_dictionary";
 
 import FileLine from "./lines/FileLine.vue";
+import { ICodeView } from "../types/ICodeView";
 
 const props = defineProps<{
   /** 當前Tab名稱 */
   targetTabName: string;
   /** 上傳的檔案列表 */
   fileInfoMap: Map<string, FileInfo>;
-  /** 跳轉到行的資訊物件 */
-  toPositionObj: { targetTabName: string; index: number };
 }>();
 
 const emit = defineEmits<{
@@ -64,6 +63,7 @@ function onElementClicked(rl: ParsedLine, index: number) {
     index: index,
     rl: rl,
     fieldInfoList: fieldInfoList.value,
+    linkMap: linkMap.value,
   });
   lineClicked.value = index;
   if (rl.formTypeSpecifications) {
@@ -81,25 +81,25 @@ const selectedBar = computed(() => {
   return "";
 });
 
-/**
- * 跳轉到行
- * 有點彆扭的實作，每tab去監聽此物件是否被更新，如果當前tab是自己，則移動到該行
- */
-watch(
-  () => props.toPositionObj,
-  (nV, oV) => {
-    if (nV.targetTabName === props.targetTabName) {
-      let el: Element = divs.value[nV.index];
-      if (el) {
-        el.scrollIntoView();
-      }
-    }
-  }
-);
-
 function scrollToRef(position: Position, preIndex: number) {
   emit("scrollToRef", position, preIndex);
 }
+
+/**
+ * 跳到指定行
+ * @param index
+ */
+function scrollByIndex(index: number) {
+  let el: Element = divs.value[index];
+  if (el) {
+    el.scrollIntoView();
+  }
+}
+
+defineExpose<ICodeView>({
+  scrollByIndex: scrollByIndex,
+  getName: (): string => props.targetTabName,
+});
 </script>
 
 <template>
@@ -128,7 +128,6 @@ function scrollToRef(position: Position, preIndex: number) {
       </Select>
     </Col>
   </Row>
-
   <div class="text-block0">
     <div class="container">
       <div class="cont_elements">

@@ -56,34 +56,35 @@ function onClick_ctrl() {
 }
 
 const visible = ref<boolean>(false);
-const hovered = ref<boolean>(false);
+// const hovered = ref<boolean>(false);
 </script>
 
 <template>
-  <span @mouseover="hovered = true" @mouseleave="hovered = false">
+  <!-- <span @mouseover="hovered = true" @mouseleave="hovered = false"> -->
+  <span>
     <!-- 有欄位資訊 -->
     <template v-if="targetFieldInfo">
       <!-- 被hover 且 沒按ctrl 則只需要Tooltip-->
-      <template v-if="hovered">
-        <Tooltip :delay="500" width="300" transfer>
-          <span :class="clickableFieldClass" @click="onClick_ctrl()">
-            {{ fieldText }}
-          </span>
-          <template #content>
-            <span v-if="targetFieldInfo.info.title">
-              {{ targetFieldInfo.info.title }}<br />
-            </span>
-            {{ targetFieldInfo.info.content ?? "" }}
-          </template>
-        </Tooltip>
-      </template>
-
-      <!-- 沒被hover -->
-      <template v-else>
+      <!-- <template v-if="hovered"> -->
+      <Tooltip :delay="500" width="300" transfer>
         <span :class="clickableFieldClass" @click="onClick_ctrl()">
           {{ fieldText }}
         </span>
-      </template>
+        <template #content>
+          <span v-if="targetFieldInfo.info.title">
+            {{ targetFieldInfo.info.title }}<br />
+          </span>
+          {{ targetFieldInfo.info.content ?? "" }}
+        </template>
+      </Tooltip>
+      <!-- </template> -->
+
+      <!-- 沒被hover -->
+      <!-- <template v-else>
+        <span :class="clickableFieldClass" @click="onClick_ctrl()">
+          {{ fieldText }}
+        </span>
+      </template> -->
     </template>
     <template v-else>
       <StaticField :field-text="fieldText" />
