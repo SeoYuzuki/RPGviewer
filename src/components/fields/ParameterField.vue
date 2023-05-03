@@ -66,15 +66,18 @@ const visible = ref<boolean>(false);
     <template v-if="targetFieldInfo">
       <!-- 被hover 且 沒按ctrl 則只需要Tooltip-->
       <!-- <template v-if="hovered"> -->
-      <Tooltip :delay="500" width="300" transfer>
+      <Tooltip :delay="500" width="500" max-width="500" transfer>
         <span :class="clickableFieldClass" @click="onClick_ctrl()">
           {{ fieldText }}
         </span>
-        <template #content>
-          <span v-if="targetFieldInfo.info.title">
-            {{ targetFieldInfo.info.title }}<br />
-          </span>
-          {{ targetFieldInfo.info.content ?? "" }}
+        <template style="white-space: normal" #content>
+          <template v-for="e in targetFieldInfoList">
+            <span v-if="e.info.title">
+              {{ e.info.title }}
+            </span>
+            {{ e.info.content ?? "" }}
+            <br />
+          </template>
         </template>
       </Tooltip>
       <!-- </template> -->

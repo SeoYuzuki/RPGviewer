@@ -210,6 +210,7 @@ function closePopTip() {
 </script>
 
 <template>
+  <!-- 同名區 -->
   <div
     v-if="showCard"
     class="ivu-modal-wrap"
@@ -228,6 +229,7 @@ function closePopTip() {
       </template>
     </Card>
   </div>
+  <!-- 右方抽屜 -->
   <Drawer title="files" placement="right" :mask="false" v-model="isShowDrawer">
     <FileDrawer :dssInfoMap="fileInfoMap" @openTab="openTab" />
   </Drawer>

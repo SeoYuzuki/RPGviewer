@@ -2,6 +2,8 @@ Test cases are from https://github.com/barrettotte/vscode-ibmi-languages/
 thx
 
 DOING
+0. Traditional Definition Specification Statement
+https://www.ibm.com/docs/en/i/7.4?topic=specifications-traditional-definition-specification-statement
 1. 加強A卡分析
 2. 整理調整後用不到東西，並提出上傳區塊
 3. F卡 rename連結
@@ -13,6 +15,9 @@ BUG
 
 TODO 
 1. formType O
+
+
+npm install @babel/generator ?
 
 
 # Vue 3 + TypeScript + Vite
