@@ -1,5 +1,6 @@
 import { onMounted, ref } from "vue";
 
+/** 是否按下ctrl */
 const isCtrlPress = ref<boolean>(false);
 export default function () {
     onMounted(() => {
@@ -21,6 +22,5 @@ export default function () {
         isCtrlPress
     };
 }
-
 
 export { isCtrlPress }

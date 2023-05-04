@@ -1,7 +1,9 @@
-import { isNotBlank, isBlank } from "../utils/StringUtils"
+import { isNotBlank } from "../utils/StringUtils"
 import { ParsedLine, RPGContent } from "../types/parsedRpgFile"
 import { FieldInfo, Position } from "../types/FieldInfo";
 import { ref } from "@vue/reactivity";
+import isBlank from "is-blank"
+
 
 /** 全域共用的欄位資訊 例如檔案本身，常數 */
 const publicFieldInfoList = ref<FieldInfo[]>([]);
@@ -192,6 +194,27 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                 }
             } else if (rl.formType === 'E') {
                 let map: Map<String, RPGContent> = rl.contentMap;
+
+                let arrayType = "";
+                /**
+                 * https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh75.html
+                 */
+                if (isNotBlank(map.get("From_File_Name")?.value)
+                    && isNotBlank(map.get("Entries_per_Record")?.value)) {
+                    // prerun-time array
+                    arrayType = "Prerun-time array."
+                } else if (isBlank(map.get("From_File_Name")?.value)
+                    && isNotBlank(map.get("Entries_per_Record")?.value)) {
+                    // compile-time array
+                    arrayType = "Compile-time array."
+                }
+                else if (isBlank(map.get("From_File_Name")?.value)
+                    && isBlank(map.get("Entries_per_Record")?.value)) {
+                    // run-time array
+                    arrayType = "Run-time array."
+                }
+
+
                 if (map.get("Array_or_Table_Name1")) {
                     fieldInfoList.push({
                         position: {
@@ -199,6 +222,31 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                             index: rl.index
                         },
                         fieldName: map.get("Array_or_Table_Name1")?.value,
+                        info: {
+                            content: (
+                                arrayType + "\r\n" +
+                                "Entries per Record:" +
+                                map.get("Entries_per_Record")?.value +
+                                "\r\n" +
+                                "Entries per Array or Table:" +
+                                map.get("Entries_per_Array_or_Table")?.value +
+                                "\r\n" +
+                                "Length of Entry:" +
+                                map.get("Length_of_Entry1")?.value +
+                                "\r\n"
+                            ),
+                            title: ""
+                        }
+                    });
+                }
+
+                if (map.get("Array_or_Table_Name2")) {
+                    fieldInfoList.push({
+                        position: {
+                            fileName: fileName,
+                            index: rl.index
+                        },
+                        fieldName: map.get("Array_or_Table_Name2")?.value,
                         info: {
                             content: (
                                 "It's a Array or Table.\r\n" +
@@ -209,7 +257,7 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                                 map.get("Entries_per_Array_or_Table")?.value +
                                 "\r\n" +
                                 "Length of Entry:" +
-                                map.get("Length_of_Entry1")?.value +
+                                map.get("Length_of_Entry2")?.value +
                                 "\r\n"
                             ),
                             title: ""

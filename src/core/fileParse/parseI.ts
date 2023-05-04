@@ -1,5 +1,6 @@
 import { RPGContent } from "../../types/parsedRpgFile";
-import { isBlank, isNotBlank, substr_by_bytes, ezCutUtil } from "../../utils/StringUtils"
+import { ezCutUtil } from "../../utils/StringUtils"
+import isBlank from "is-blank"
 
 /**
  * Input spec record identification (I prompt)
