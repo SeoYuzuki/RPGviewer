@@ -1,19 +1,30 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from "vue";
+import { ref, onMounted, watch, nextTick, Ref } from "vue";
 import { Button } from "view-ui-plus";
 
 import AuxiliaryCross from "../utils/AuxiliaryCross";
+import KeyPress from "../utils/KeyPress";
+import { useMouse } from "../utils/mouse";
+
 import { parseFile, fileInfoMap } from "../core/fileParse/fileParser";
 import { FileInfo } from "../types/parsedRpgFile";
-import { Position } from "../types/FieldInfo";
+import { FieldInfo, Position } from "../types/FieldInfo";
+
 /** components */
 import FileDrawer from "./FileDrawer.vue";
 import ReadMe from "./ReadMe.vue";
 import JumpLine from "./JumpLine.vue";
 import CodeView from "./CodeView.vue";
+import { ICodeView } from "../types/ICodeView";
 
 /** 十字線事件 */
 let openAuxiliaryCross = AuxiliaryCross().openAuxiliaryCross;
+let isCtrlPress: Ref<boolean> = KeyPress().isCtrlPress;
+
+/**
+ * 滑鼠位置
+ */
+const { x, y } = useMouse();
 
 /**
  * 上傳
@@ -61,27 +72,44 @@ function scrollToRef(position: Position, preIndex: number) {
     index: preIndex,
   });
   positionHistList.value.push(position);
-  toPosition();
+  toPosition(positionHistList.value[positionHistIndex.value - 1]);
 }
 
+/** codeView元件清單 */
+const codeViewList = ref<any>([]);
+
 /**
- * 跳轉到行的資訊物件
- * 有點彆扭的實作，每tab去監聽此物件是否被更新，如果當前tab是自己，則移動到該行
+ * 跳到指定TAB 指定行數
+ * @param position
  */
-const toPositionObj = ref<{ targetTabName: string; index: number }>({
-  targetTabName: "",
-  index: 0,
-});
-function toPosition() {
-  let position = positionHistList.value[positionHistIndex.value - 1];
+
+function toPosition(position: Position) {
+  let codeView: ICodeView | undefined = undefined;
+
+  if (position.fileName == targetTabName.value) {
+    // 用for迴圈查找ref list, 不直接用ref綁定成Map是因為效能
+    for (const temp of codeViewList.value) {
+      if (temp.getName() === position.fileName) {
+        codeView = temp;
+      }
+    }
+    if (codeView) {
+      codeView.scrollByIndex(position.index);
+    }
+
+    return;
+  }
   openTab(position.fileName);
-  console.log({ position: position });
-  /** 等Tab切換完成後再移動到位置 */
+  /** 等Tab切換完成後再移動到位置  */
   nextTick(() => {
-    toPositionObj.value = {
-      targetTabName: targetTabName.value,
-      index: position.index - 1,
-    };
+    for (const temp of codeViewList.value) {
+      if (temp.getName() === position.fileName) {
+        codeView = temp;
+      }
+    }
+    if (codeView) {
+      codeView.scrollByIndex(position.index);
+    }
   });
 }
 
@@ -95,13 +123,13 @@ function scrollToPrePostition(type: "ArrowRight" | "ArrowLeft") {
       return;
     }
     positionHistIndex.value--;
-    toPosition();
+    toPosition(positionHistList.value[positionHistIndex.value - 1]);
   } else if (type === "ArrowRight") {
     if (positionHistIndex.value >= positionHistList.value.length) {
       return;
     }
     positionHistIndex.value++;
-    toPosition();
+    toPosition(positionHistList.value[positionHistIndex.value - 1]);
   }
 }
 
@@ -125,9 +153,12 @@ onMounted(() => {
   });
 });
 
+/**
+ * 切換TAB，若TAB已關閉則開啟
+ * @param key
+ */
 function openTab(key: string) {
   let fileName = key.trim();
-  console.log("openTab", { key: fileName, t: tabList.value });
   let temp = fileInfoMap.value.get(fileName);
   if (temp) {
     // 如果上方tab不存在則添加
@@ -156,9 +187,49 @@ function handleTabRemove(name: string) {
   console.log(name);
   tabList.value = tabList.value.filter((e) => e.fileName != name);
 }
+
+/**
+ * 同名提示區
+ */
+const showCard = ref<boolean>(false);
+const cardX = ref<number>();
+const cardY = ref<number>();
+const popFieldInfoList = ref<FieldInfo[]>([]);
+const popPreNumber = ref<number>(0);
+function popCard(temp: { fieldInfoList: FieldInfo[]; preIndex: number }) {
+  popFieldInfoList.value = temp.fieldInfoList;
+  popPreNumber.value = temp.preIndex;
+  cardX.value = x.value;
+  cardY.value = y.value;
+  showCard.value = true;
+}
+
+function closePopTip() {
+  showCard.value = false;
+}
 </script>
 
 <template>
+  <!-- 同名區 -->
+  <div
+    v-if="showCard"
+    class="ivu-modal-wrap"
+    style="z-index: 998"
+    @click="closePopTip"
+  >
+    <Card
+      style="position: absolute"
+      :style="{ top: cardY + 'px', left: cardX + 'px', 'z-index': 999 }"
+    >
+      <template v-for="e in popFieldInfoList">
+        <span @click="scrollToRef(e.position, popPreNumber)">
+          at {{ e.position.fileName }}, line:{{ e.position.index }}
+        </span>
+        <br />
+      </template>
+    </Card>
+  </div>
+  <!-- 右方抽屜 -->
   <Drawer title="files" placement="right" :mask="false" v-model="isShowDrawer">
     <FileDrawer :dssInfoMap="fileInfoMap" @openTab="openTab" />
   </Drawer>
@@ -167,6 +238,7 @@ function handleTabRemove(name: string) {
       <Button icon="ios-cloud-upload-outline">upload files</Button>
     </Upload>
     <Button @click="isShowDrawer = !isShowDrawer" type="primary">files</Button>
+
     <Col span="5">
       十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
     </Col>
@@ -192,10 +264,11 @@ function handleTabRemove(name: string) {
       :name="fileInfo.fileName"
     >
       <CodeView
+        ref="codeViewList"
         :fileInfoMap="fileInfoMap"
         :targetTabName="fileInfo.fileName"
-        :to-position-obj="toPositionObj"
         @scrollToRef="scrollToRef"
+        @popCard="popCard"
       >
       </CodeView>
     </TabPane>

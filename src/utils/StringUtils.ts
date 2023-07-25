@@ -1,3 +1,5 @@
+import isBlank from "is-blank"
+
 /**
  * 依照charCode切割字串
  * 如果非全形字，長度為。全型長度為2
@@ -65,14 +67,10 @@ function isEmpty(str: string) {
     return (!str || str.length === 0);
 }
 
-function isBlank(str: string) {
-    return (!str || /^\s*$/.test(str));
-}
 
-function isNotBlank(str: string) {
+
+function isNotBlank(str: any) {
     return !isBlank(str);
 }
 
-
-
-export { substr_by_bytes, ezCutUtil, isEmpty, isBlank, isNotBlank }
+export { ezCutUtil, isEmpty, isNotBlank }

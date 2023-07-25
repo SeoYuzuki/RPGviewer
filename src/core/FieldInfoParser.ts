@@ -1,13 +1,19 @@
-import { isNotBlank, isBlank } from "../utils/StringUtils"
+import { isNotBlank } from "../utils/StringUtils"
 import { ParsedLine, RPGContent } from "../types/parsedRpgFile"
 import { FieldInfo, Position } from "../types/FieldInfo";
 import { ref } from "@vue/reactivity";
+import isBlank from "is-blank"
+
 
 /** 全域共用的欄位資訊 例如檔案本身，常數 */
 const publicFieldInfoList = ref<FieldInfo[]>([]);
 /** 所有引入檔案的欄位資訊 例如該檔案裏面定義的欄位 */
 const allFieldInfoMap = ref<Map<string, FieldInfo[]>>(new Map());
 const linkMap = ref<Map<string, string[]>>(new Map());
+
+function initLinkMap(fileName: string) {
+    linkMap.value.set(fileName, []);
+}
 
 /**
  * 
@@ -31,6 +37,11 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
 
     let noCommentsRpg = parsedRpgFile.filter(e => { return e.formType !== 'comments' });
     let fieldInfoList: FieldInfo[] = [];
+
+    // 佔存最新一筆大項名稱資訊，給子項作為資訊
+    let tempRecordName_Record_Identification_External = "";
+    let tempDsName = "";
+
     /** 迴圈查找檔案中的定義欄位 */
     for (let count = 0; count < noCommentsRpg.length; count++) {
         try {
@@ -124,19 +135,16 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                         }
                     });
                 } else if (rl.formTypeSpecifications === "Record_Identification_External") {
-                    // fieldInfoList.push({
-                    //     position: {
-                    //         fileName: fileName,
-                    //         index: rl.index
-                    //     },
-                    //     fieldName: map.get("Record Name")?.value,
-                    //     info: {
-                    //         content: "Record",
-                    //         class: "record",
-                    //         title: "",
-                    //     }
-                    // });
+                    let temp = map.get("Record Name")?.value;
+                    if (temp) {
+                        tempRecordName_Record_Identification_External = temp;
+                    }
                 } else if (rl.formTypeSpecifications === "Field_Description_External") {
+                    let content = "Renamed field.";
+                    if (isNotBlank(tempRecordName_Record_Identification_External)) {
+                        content = `Renamed field, from ${tempRecordName_Record_Identification_External}.${map.get("External Field Name")?.value}`;
+                    }
+
                     fieldInfoList.push({
                         position: {
                             fileName: fileName,
@@ -144,11 +152,12 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                         },
                         fieldName: map.get("Field Name")?.value,
                         info: {
-                            content: "Field of record.",
+                            content: content,
                             title: "",
                         }
                     });
                 } else if (rl.formTypeSpecifications === "Data_Structure") {
+                    tempDsName = map.get("Data Structure Name")?.value || "";
                     fieldInfoList.push({
                         position: {
                             fileName: fileName,
@@ -169,7 +178,8 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                         },
                         fieldName: map.get("Field Name")?.value,
                         info: {
-                            content: "Field of data structure",
+                            content: isBlank(tempDsName) ?
+                                "Field of data structure" : `Field of data structure ${tempDsName}`,
                             title: "",
                         }
                     });
@@ -181,13 +191,34 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                         },
                         fieldName: map.get("Constant Name")?.value,
                         info: {
-                            content: "Constant Name",
+                            content: "Constant, " + map.get("Constant")?.value,
                             title: "",
                         }
                     });
                 }
             } else if (rl.formType === 'E') {
                 let map: Map<String, RPGContent> = rl.contentMap;
+
+                let arrayType = "";
+                /**
+                 * https://www.ibm.com/docs/en/rdfi/9.6.0?topic=SSAE4W_9.6.0/com.ibm.etools.iseries.langref.doc/evferlsh75.html
+                 */
+                if (isNotBlank(map.get("From_File_Name")?.value)
+                    && isNotBlank(map.get("Entries_per_Record")?.value)) {
+                    // prerun-time array
+                    arrayType = "Prerun-time array."
+                } else if (isBlank(map.get("From_File_Name")?.value)
+                    && isNotBlank(map.get("Entries_per_Record")?.value)) {
+                    // compile-time array
+                    arrayType = "Compile-time array."
+                }
+                else if (isBlank(map.get("From_File_Name")?.value)
+                    && isBlank(map.get("Entries_per_Record")?.value)) {
+                    // run-time array
+                    arrayType = "Run-time array."
+                }
+
+
                 if (map.get("Array_or_Table_Name1")) {
                     fieldInfoList.push({
                         position: {
@@ -197,7 +228,7 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                         fieldName: map.get("Array_or_Table_Name1")?.value,
                         info: {
                             content: (
-                                "It's a Array or Table.\r\n" +
+                                arrayType + "\r\n" +
                                 "Entries per Record:" +
                                 map.get("Entries_per_Record")?.value +
                                 "\r\n" +
@@ -213,15 +244,36 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                     });
                 }
 
+                if (map.get("Array_or_Table_Name2")) {
+                    fieldInfoList.push({
+                        position: {
+                            fileName: fileName,
+                            index: rl.index
+                        },
+                        fieldName: map.get("Array_or_Table_Name2")?.value,
+                        info: {
+                            content: (
+                                "It's a Array or Table.\r\n" +
+                                "Entries per Record:" +
+                                map.get("Entries_per_Record")?.value +
+                                "\r\n" +
+                                "Entries per Array or Table:" +
+                                map.get("Entries_per_Array_or_Table")?.value +
+                                "\r\n" +
+                                "Length of Entry:" +
+                                map.get("Length_of_Entry2")?.value +
+                                "\r\n"
+                            ),
+                            title: ""
+                        }
+                    });
+                }
+
             } else if (rl.formType === 'F') {
                 let map: Map<String, RPGContent> = rl.contentMap;
                 if (rl.formTypeSpecifications === "File_Description") {
                     if (map.get("File Name")) {
-                        if (linkMap.value.get(fileName)) {
-                            linkMap.value.get(fileName)?.push(map.get("File Name")?.value.trim() ?? "")
-                        } else {
-                            linkMap.value.set(fileName, [map.get("File Name")?.value.trim() ?? ""])
-                        }
+                        linkMap.value.get(fileName)?.push(map.get("File Name")?.value.trim() ?? "")
                     }
                 } else if (rl.formTypeSpecifications === "Continuation_Lines") {
                     if (map.get("Option")?.value === 'RENAME') {
@@ -273,6 +325,11 @@ const saveFieldInfoList_A = function (parsedRpgFile: ParsedLine[], fileName: str
                 index: rl.index
             };
             if (rl.formTypeSpecifications === "Physical_And_logical_Files") {
+                if (map.get("DDS keyword function name")?.value === 'PFILE') {
+                    linkMap.value.get(fileName)?.push(map.get("DDS keyword para")?.value.trim() ?? "")
+                }
+
+
                 if (map.get("Type of Name")?.value === 'R') {
                     let s = "";
                     if (rl.contentMap.get('DDS keyword function name')?.value === "TEXT") {
@@ -339,4 +396,4 @@ const saveFieldInfoList_A = function (parsedRpgFile: ParsedLine[], fileName: str
 
 }
 
-export { saveFieldInfoList, saveFieldInfoList_A, publicFieldInfoList, allFieldInfoMap, linkMap }
+export { initLinkMap, saveFieldInfoList, saveFieldInfoList_A, publicFieldInfoList, allFieldInfoMap, linkMap }

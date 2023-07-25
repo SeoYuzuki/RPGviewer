@@ -2,11 +2,12 @@ import { parseRpgFile } from "./RpgFileParser";
 import { parseDdsFile } from "./DDSFileParser";
 import { FileInfo, ParsedLine } from "../../types/parsedRpgFile";
 import { getContentByFile } from "../../utils/A1Utils";
-import { saveFieldInfoList, saveFieldInfoList_A } from "../FieldInfoParser"
+import { initLinkMap, saveFieldInfoList, saveFieldInfoList_A } from "../FieldInfoParser"
 import { Ref, ref } from "vue";
 
 function getParsedLineList(rawFile: string, name: string, fileExtension: string): ParsedLine[] {
     let parsedFile: ParsedLine[] = [];
+    initLinkMap(name);
     if (["dds", "pf"].includes(fileExtension)) {
         parsedFile = parseDdsFile(rawFile);
         saveFieldInfoList_A(parsedFile, name, "public");
@@ -23,7 +24,6 @@ function getParsedLineList(rawFile: string, name: string, fileExtension: string)
 
 /** 上傳的檔案列表 */
 const fileInfoMap = ref<Map<string, FileInfo>>(new Map());
-
 
 async function parseFile(file: File, tabList: Ref<FileInfo[]>): Promise<boolean> {
     try {

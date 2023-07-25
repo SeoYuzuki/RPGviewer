@@ -1,6 +1,7 @@
 import { ParsedLine, RPGContent } from "../../types/parsedRpgFile";
 import { parseDDS_PF } from "./parseA";
-import { isBlank, isNotBlank, substr_by_bytes, ezCutUtil } from "../../utils/StringUtils"
+import { isNotBlank, substr_by_bytes, ezCutUtil } from "../../utils/StringUtils"
+import isBlank from "is-blank"
 
 const parseDdsFile = function (ddsFile: string): ParsedLine[] {
     let ddsRawLines: string[] = ddsFile.split('\r\n');

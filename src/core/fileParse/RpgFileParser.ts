@@ -1,5 +1,6 @@
-import { isBlank, isNotBlank, substr_by_bytes, ezCutUtil } from "../../utils/StringUtils"
-import { ParsedLine, RPGContent } from "../../types/parsedRpgFile"
+import isBlank from "is-blank"
+import { isNotBlank, ezCutUtil } from "../../utils/StringUtils"
+import { ParsedLine } from "../../types/parsedRpgFile"
 import parseControlSpecification from "./parseH"
 import parseExtensionSpecification from "./parseE"
 import parseCalculationSpecification from "./parseC"
@@ -101,7 +102,7 @@ const parseRpgFile = function (_rpgFile: string): ParsedLine[] {
                                 contentMap: new Map()
                             });
                             continue;
-                        } else if (substr_by_bytes(tempRl, 18, 2) === 'DS'
+                        } else if (tempEzCut(19, 20) === 'DS'
                             || tempEzCut(6, 6) !== 'I'
                             || isNotBlank(tempEzCut(15, 18))
                             || !(isBlank(tempEzCut(7, 20)) && isBlank(tempEzCut(44, 52)) && isBlank(tempEzCut(59, 74)))

@@ -1,5 +1,6 @@
 import { RPGContent } from "../../types/parsedRpgFile";
-import { isBlank, isNotBlank, substr_by_bytes, ezCutUtil } from "../../utils/StringUtils"
+import { ezCutUtil } from "../../utils/StringUtils"
+import isBlank from "is-blank"
 
 /**
  * Input spec record identification (I prompt)
@@ -96,7 +97,7 @@ function parseFieldDescriptionEntries_JX(rl: string): Map<string, RPGContent> {
     contentMap.set('HEAD_COMMENT', { value: ezCut(1, 5), class: "comments" });
     contentMap.set('Form Type', { value: ezCut(6, 6), view: "KeywordField", dic: "Form_Type_Dic" });
     contentMap.set('Reserved1', { value: ezCut(7, 20) });
-    contentMap.set('External Field Name', { value: ezCut(21, 30) });
+    contentMap.set('External Field Name', { value: ezCut(21, 30), view: "ParameterField" });
     contentMap.set('Reserved2', { value: ezCut(31, 52) });
     contentMap.set('Field Name', { value: ezCut(53, 58), view: "ParameterField" });
     contentMap.set('Control Level', { value: ezCut(59, 60) });
