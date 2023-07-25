@@ -2,6 +2,7 @@
 import { ref, computed, watch } from "vue";
 import { FieldInfo, Position } from "../types/FieldInfo";
 import { FileInfo, ParsedLine } from "../types/parsedRpgFile";
+import { isShowColumnGridLine } from "../utils/Setting";
 import {
   publicFieldInfoList,
   linkMap,
@@ -103,7 +104,7 @@ defineExpose<ICodeView>({
 </script>
 
 <template>
-  <Row :gutter="0">
+  <Row v-show="isShowColumnGridLine" :gutter="0">
     <Col span="18">
       {{
         "________________1_________2_________3_________4_________5_________6_________7_________8"
@@ -128,7 +129,7 @@ defineExpose<ICodeView>({
       </Select>
     </Col>
   </Row>
-  <div class="text-block0">
+  <div :class="isShowColumnGridLine ? 'text-block0' : 'text-block1'">
     <div class="container">
       <div class="cont_elements">
         <div
@@ -176,7 +177,16 @@ defineExpose<ICodeView>({
   /* position: relative; */
   background-color: rgb(0, 0, 0);
   color: rgb(255, 255, 255);
-  height: 75vh;
+  height: calc(100vh - (190px));
+  width: 100%;
+}
+
+.text-block1 {
+  /* position: absolute; */
+  /* position: relative; */
+  background-color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
+  height: calc(100vh - (120px));
   width: 100%;
 }
 

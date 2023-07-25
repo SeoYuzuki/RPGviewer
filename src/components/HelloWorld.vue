@@ -3,6 +3,7 @@ import { ref, onMounted, watch, nextTick, Ref, computed } from "vue";
 import { Button, Col, Tabs } from "view-ui-plus";
 
 import AuxiliaryCross from "../utils/AuxiliaryCross";
+import { isShowColumnGridLine } from "../utils/Setting";
 import KeyPress from "../utils/KeyPress";
 import { useMouse } from "../utils/mouse";
 
@@ -267,42 +268,22 @@ function closePopTip() {
 </script>
 
 <template>
-  <!-- 同名區 -->
-  <div
-    v-if="showCard"
-    class="ivu-modal-wrap"
-    style="z-index: 998"
-    @click="closePopTip"
-  >
-    <Card
-      style="position: absolute"
-      :style="{ top: cardY + 'px', left: cardX + 'px', 'z-index': 999 }"
-    >
-      <template v-for="e in popFieldInfoList">
-        <span @click="scrollToRef(e.position, popPreNumber)">
-          at {{ e.position.fileName }}, line:{{ e.position.index }}
-        </span>
-        <br />
-      </template>
-    </Card>
-  </div>
-  <!-- 右方抽屜 -->
-  <Drawer title="files" placement="right" :mask="false" v-model="isShowDrawer">
-    <FileDrawer :dssInfoMap="fileInfoMap" @openTab="openTab" />
-  </Drawer>
   <Row :gutter="16">
     <Upload multiple :before-upload="handleUpload">
       <Button icon="ios-cloud-upload-outline">upload files</Button>
     </Upload>
     <Button @click="isShowDrawer = !isShowDrawer" type="primary">files</Button>
 
-    <Col span="5">
+    <Col span="3">
       十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
     </Col>
     <Col span="3">
-      <Button type="primary" @click="isShowReadMe = !isShowReadMe"
-        >Read Me</Button
-      >
+      長度輔助 <i-Switch v-model="isShowColumnGridLine"> </i-Switch>
+    </Col>
+    <Col span="3">
+      <Button type="primary" @click="isShowReadMe = !isShowReadMe">
+        Read Me
+      </Button>
     </Col>
   </Row>
 
@@ -340,7 +321,7 @@ function closePopTip() {
         </template>
       </Tabs>
     </Col>
-    <Col span="12">
+    <Col v-if="tab1length === 12" span="12">
       <Tabs
         v-model="targetTabName2"
         type="card"
@@ -375,11 +356,37 @@ function closePopTip() {
   </Row>
 
   <ReadMe v-model:isShowReadMe="isShowReadMe" />
+
   <JumpLine
     v-model:is-show="isShowJumpLine"
     :targetTabName="targetTabName1"
     @jump-to-line="scrollToRef"
   />
+
+  <!-- 右方抽屜 -->
+  <Drawer title="files" placement="right" :mask="false" v-model="isShowDrawer">
+    <FileDrawer :dssInfoMap="fileInfoMap" @openTab="openTab" />
+  </Drawer>
+
+  <!-- 同名欄位區 -->
+  <div
+    v-if="showCard"
+    class="ivu-modal-wrap"
+    style="z-index: 998"
+    @click="closePopTip"
+  >
+    <Card
+      style="position: absolute"
+      :style="{ top: cardY + 'px', left: cardX + 'px', 'z-index': 999 }"
+    >
+      <template v-for="e in popFieldInfoList">
+        <span @click="scrollToRef(e.position, popPreNumber)">
+          at {{ e.position.fileName }}, line:{{ e.position.index }}
+        </span>
+        <br />
+      </template>
+    </Card>
+  </div>
 </template>
 
 <style scoped></style>
