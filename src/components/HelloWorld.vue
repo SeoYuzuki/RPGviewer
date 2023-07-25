@@ -265,27 +265,34 @@ function popCard(temp: { fieldInfoList: FieldInfo[]; preIndex: number }) {
 function closePopTip() {
   showCard.value = false;
 }
+
+const upHere = ref<boolean>(true);
 </script>
 
 <template>
-  <Row :gutter="16">
-    <Upload multiple :before-upload="handleUpload">
-      <Button icon="ios-cloud-upload-outline">upload files</Button>
-    </Upload>
-    <Button @click="isShowDrawer = !isShowDrawer" type="primary">files</Button>
-
-    <Col span="3">
-      十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
-    </Col>
-    <Col span="3">
-      長度輔助 <i-Switch v-model="isShowColumnGridLine"> </i-Switch>
-    </Col>
-    <Col span="3">
-      <Button type="primary" @click="isShowReadMe = !isShowReadMe">
-        Read Me
+  <div class="top" @mouseover="upHere = true">==================</div>
+  <Drawer placement="top" height="5px" :closable="false" v-model="upHere">
+    <Row :gutter="16">
+      <Upload multiple :before-upload="handleUpload">
+        <Button icon="ios-cloud-upload-outline">upload files</Button>
+      </Upload>
+      <Button @click="isShowDrawer = !isShowDrawer" type="primary"
+        >files
       </Button>
-    </Col>
-  </Row>
+
+      <Col span="3">
+        十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
+      </Col>
+      <Col span="3">
+        長度輔助 <i-Switch v-model="isShowColumnGridLine"> </i-Switch>
+      </Col>
+      <Col span="3">
+        <Button type="primary" @click="isShowReadMe = !isShowReadMe">
+          Read Me
+        </Button>
+      </Col>
+    </Row>
+  </Drawer>
 
   <Row>
     <Col :span="tab1length">
@@ -389,4 +396,12 @@ function closePopTip() {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.top {
+  width: 100%;
+  color: rgb(112, 112, 112);
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+}
+</style>

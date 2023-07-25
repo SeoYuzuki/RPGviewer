@@ -177,7 +177,7 @@ defineExpose<ICodeView>({
   /* position: relative; */
   background-color: rgb(0, 0, 0);
   color: rgb(255, 255, 255);
-  height: calc(100vh - (190px));
+  height: calc(100vh - (140px));
   width: 100%;
 }
 
@@ -186,7 +186,7 @@ defineExpose<ICodeView>({
   /* position: relative; */
   background-color: rgb(0, 0, 0);
   color: rgb(255, 255, 255);
-  height: calc(100vh - (120px));
+  height: calc(100vh - (70px));
   width: 100%;
 }
 
