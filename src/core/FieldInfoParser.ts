@@ -38,7 +38,9 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
     let noCommentsRpg = parsedRpgFile.filter(e => { return e.formType !== 'comments' });
     let fieldInfoList: FieldInfo[] = [];
 
+    // 佔存最新一筆大項名稱資訊，給子項作為資訊
     let tempRecordName_Record_Identification_External = "";
+    let tempDsName = "";
 
     /** 迴圈查找檔案中的定義欄位 */
     for (let count = 0; count < noCommentsRpg.length; count++) {
@@ -155,6 +157,7 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                         }
                     });
                 } else if (rl.formTypeSpecifications === "Data_Structure") {
+                    tempDsName = map.get("Data Structure Name")?.value || "";
                     fieldInfoList.push({
                         position: {
                             fileName: fileName,
@@ -175,7 +178,8 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                         },
                         fieldName: map.get("Field Name")?.value,
                         info: {
-                            content: "Field of data structure",
+                            content: isBlank(tempDsName) ?
+                                "Field of data structure" : `Field of data structure ${tempDsName}`,
                             title: "",
                         }
                     });
@@ -187,7 +191,7 @@ const saveFieldInfoList = function (parsedRpgFile: ParsedLine[], fileName: strin
                         },
                         fieldName: map.get("Constant Name")?.value,
                         info: {
-                            content: "Constant Name",
+                            content: "Constant, " + map.get("Constant")?.value,
                             title: "",
                         }
                     });

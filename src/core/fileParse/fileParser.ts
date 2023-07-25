@@ -25,7 +25,6 @@ function getParsedLineList(rawFile: string, name: string, fileExtension: string)
 /** 上傳的檔案列表 */
 const fileInfoMap = ref<Map<string, FileInfo>>(new Map());
 
-
 async function parseFile(file: File, tabList: Ref<FileInfo[]>): Promise<boolean> {
     try {
         let fileExtension = (/[.]/.exec(file.name) ? file.name.split(".")[1] : "")
