@@ -1,23 +1,21 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick, Ref, computed } from "vue";
 import { Button, Col, Tabs } from "view-ui-plus";
-
+/** utils */
 import AuxiliaryCross from "../utils/AuxiliaryCross";
-import { isShowColumnGridLine } from "../utils/Setting";
 import KeyPress from "../utils/KeyPress";
 import { useMouse } from "../utils/mouse";
-
+/** types */
 import { parseFile, fileInfoMap } from "../core/fileParse/fileParser";
 import { FileInfo } from "../types/parsedRpgFile";
 import { FieldInfo, Position } from "../types/FieldInfo";
-
+import { TabContextData } from "../types/TabContextData";
 /** components */
 import FileDrawer from "./FileDrawer.vue";
 import ReadMe from "./ReadMe.vue";
 import JumpLine from "./JumpLine.vue";
 import CodeView from "./CodeView.vue";
 import { ICodeView } from "../types/ICodeView";
-import { TabContextData } from "../types/TabContextData";
 
 /** 十字線事件 */
 let openAuxiliaryCross = AuxiliaryCross().openAuxiliaryCross;
@@ -27,6 +25,9 @@ let isCtrlPress: Ref<boolean> = KeyPress().isCtrlPress;
  * 滑鼠位置
  */
 const { x, y } = useMouse();
+
+/** 上選單開關 */
+const upHere = ref<boolean>(true);
 
 /**
  * 上傳
@@ -52,6 +53,7 @@ watch(fileInfoMap.value, () => {
  */
 async function handleUpload(file: File): Promise<boolean> {
   parseFile(file, tabList1);
+  upHere.value = false;
   return false;
 }
 
@@ -66,18 +68,26 @@ let isShowJumpLine = ref<boolean>(false);
 let positionHistIndex = ref<number>(1);
 /** 位置紀錄清單 */
 let positionHistList = ref<Position[]>([]);
+
+/**
+ *
+ * @param position 目標位置
+ * @param preIndex 前位置，紀錄導向歷史用，-1表示不記錄
+ */
 function scrollToRef(position: Position, preIndex: number) {
-  positionHistList.value = positionHistList.value.slice(
-    0,
-    positionHistIndex.value - 1
-  );
-  positionHistIndex.value = positionHistIndex.value + 1;
-  positionHistList.value.push({
-    fileName: targetTabName1.value,
-    index: preIndex,
-  });
-  positionHistList.value.push(position);
-  toPosition(positionHistList.value[positionHistIndex.value - 1]);
+  if (preIndex != -1) {
+    positionHistList.value = positionHistList.value.slice(
+      0,
+      positionHistIndex.value - 1
+    );
+    positionHistIndex.value = positionHistIndex.value + 1;
+    positionHistList.value.push({
+      fileName: targetTabName1.value,
+      index: preIndex,
+    });
+    positionHistList.value.push(position);
+  }
+  toPosition(position);
 }
 
 /** codeView元件清單 */
@@ -145,6 +155,7 @@ onMounted(() => {
     if (e.altKey) {
       if (e.key == "ArrowLeft" || e.key == "ArrowRight") {
         scrollToPrePostition(e.key);
+        e.preventDefault(); // 防止瀏覽器操作
       }
 
       if (e.key === "l") {
@@ -265,13 +276,16 @@ function popCard(temp: { fieldInfoList: FieldInfo[]; preIndex: number }) {
 function closePopTip() {
   showCard.value = false;
 }
-
-const upHere = ref<boolean>(true);
 </script>
 
 <template>
-  <div class="top" @mouseover="upHere = true">==================</div>
-  <Drawer placement="top" height="5px" :closable="false" v-model="upHere">
+  <!-- 上方選單感應開關 -->
+  <div style="display: flex; justify-content: center; width: 100%">
+    <div class="top" @mouseover="upHere = true">==================</div>
+  </div>
+
+  <!-- 上方抽屜 -->
+  <Drawer placement="top" height="7px" :closable="false" v-model="upHere">
     <Row :gutter="16">
       <Upload multiple :before-upload="handleUpload">
         <Button icon="ios-cloud-upload-outline">upload files</Button>
@@ -280,13 +294,10 @@ const upHere = ref<boolean>(true);
         >files
       </Button>
 
-      <Col span="3">
+      <Col span="4">
         十字線(alt+s) <i-Switch v-model="openAuxiliaryCross"> </i-Switch>
       </Col>
-      <Col span="3">
-        長度輔助 <i-Switch v-model="isShowColumnGridLine"> </i-Switch>
-      </Col>
-      <Col span="3">
+      <Col span="4">
         <Button type="primary" @click="isShowReadMe = !isShowReadMe">
           Read Me
         </Button>
@@ -398,7 +409,7 @@ const upHere = ref<boolean>(true);
 
 <style scoped>
 .top {
-  width: 100%;
+  width: 100px;
   color: rgb(112, 112, 112);
   font-weight: bold;
   display: flex;
