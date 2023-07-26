@@ -2,7 +2,7 @@
 import { ref, computed, watch } from "vue";
 import { FieldInfo, Position } from "../types/FieldInfo";
 import { FileInfo, ParsedLine } from "../types/parsedRpgFile";
-import { isShowColumnGridLine } from "../utils/Setting";
+import { ICodeView } from "../types/ICodeView";
 import {
   publicFieldInfoList,
   linkMap,
@@ -11,7 +11,8 @@ import {
 import { FORM_TYPE_BAR_LIST } from "../dictionary/RPG_dictionary";
 
 import FileLine from "./lines/FileLine.vue";
-import { ICodeView } from "../types/ICodeView";
+import OutLine from "./OutLine.vue";
+import { Button } from "view-ui-plus";
 
 const props = defineProps<{
   /** 當前Tab名稱 */
@@ -34,6 +35,11 @@ let selectedBarModel = ref<string>();
 /** 當前渲染程式碼 */
 const parsedRpgFile = computed(() => {
   return props.fileInfoMap.get(props.targetTabName)?.parsedLineList;
+});
+
+/** 當前大綱 */
+const outLine = computed(() => {
+  return props.fileInfoMap.get(props.targetTabName)?.outLine;
 });
 
 /** 欄位資訊清單 target + linkMap */
@@ -62,7 +68,7 @@ function onElementClicked(rl: ParsedLine, index: number) {
   console.log({
     formTypeSpecifications: rl.formTypeSpecifications,
     index: index,
-    rl: rl,
+    parsedLine: rl,
     fieldInfoList: fieldInfoList.value,
     linkMap: linkMap.value,
   });
@@ -76,10 +82,10 @@ const selectedBar = computed(() => {
   if (selectedBarModel.value) {
     return (
       FORM_TYPE_BAR_LIST.find((e) => e.value === selectedBarModel.value)?.bar ??
-      ""
+      "......................................................................."
     );
   }
-  return "";
+  return ".......................................................................";
 });
 
 function scrollToRef(position: Position, preIndex: number) {
@@ -97,6 +103,12 @@ function scrollByIndex(index: number) {
   }
 }
 
+/** 欄位數字 */
+const isShowColumnGridLine = ref<boolean>(false);
+
+/** OutLine */
+const showOutLine = ref<boolean>(false);
+
 defineExpose<ICodeView>({
   scrollByIndex: scrollByIndex,
   getName: (): string => props.targetTabName,
@@ -104,20 +116,24 @@ defineExpose<ICodeView>({
 </script>
 
 <template>
-  <Row v-show="isShowColumnGridLine" :gutter="0">
-    <Col span="18">
-      {{
-        "________________1_________2_________3_________4_________5_________6_________7_________8"
-      }}</Col
-    >
-    <Col span="18">
-      {{
-        "_______12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-      }}</Col
-    >
-    <Col span="18"> {{ "__INDEX" }}{{ selectedBar }} </Col>
-    <Col span="6">
-      <Select v-model="selectedBarModel" style="width: 250px" size="small">
+  <Row :gutter="0">
+    <template v-if="isShowColumnGridLine">
+      <Col span="24">
+        {{
+          "________________1_________2_________3_________4_________5_________6_________7_________8"
+        }}
+      </Col>
+
+      <Col span="24">
+        {{
+          "_______12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+        }}
+      </Col>
+    </template>
+
+    <Col> {{ "__INDEX" }}{{ selectedBar }} </Col>
+    <Col>
+      <Select v-model="selectedBarModel" style="width: 150px" size="small">
         <i-Option
           v-for="item in FORM_TYPE_BAR_LIST"
           :value="item.value"
@@ -127,6 +143,17 @@ defineExpose<ICodeView>({
           <span style="float: right; color: #ccc">{{ item.value }}</span>
         </i-Option>
       </Select>
+    </Col>
+    <Col>
+      <Button size="small" @click="showOutLine = true">OutLine</Button>
+    </Col>
+    <Col>
+      <Button
+        size="small"
+        @click="isShowColumnGridLine = !isShowColumnGridLine"
+      >
+        Col
+      </Button>
     </Col>
   </Row>
   <div :class="isShowColumnGridLine ? 'text-block0' : 'text-block1'">
@@ -169,6 +196,27 @@ defineExpose<ICodeView>({
       </div>
     </div>
   </div>
+
+  <Modal
+    class="a123"
+    v-model="showOutLine"
+    draggable
+    sticky
+    scrollable
+    footer-hide
+    width="210"
+    :transfer="false"
+    :mask="false"
+    :title="'OuntLine: ' + targetTabName"
+    class-name="modify-style"
+  >
+    <OutLine
+      v-if="showOutLine"
+      :targetTabName="targetTabName"
+      :outLine="outLine"
+      @scroll-to-ref="scrollToRef"
+    ></OutLine>
+  </Modal>
 </template>
 
 <style scoped>
@@ -182,11 +230,9 @@ defineExpose<ICodeView>({
 }
 
 .text-block1 {
-  /* position: absolute; */
-  /* position: relative; */
   background-color: rgb(0, 0, 0);
   color: rgb(255, 255, 255);
-  height: calc(100vh - (70px));
+  height: calc(100vh - (90px));
   width: 100%;
 }
 
@@ -216,5 +262,13 @@ defineExpose<ICodeView>({
 
 .comments {
   color: #3ba000;
+}
+</style>
+<style>
+.modify-style .ivu-modal-header {
+  padding-top: 6px;
+  padding-right: 5px;
+  padding-bottom: 4px;
+  padding-left: 15px;
 }
 </style>
